@@ -5,27 +5,40 @@
  */
 package autopwn_gui;
 
-import java.net.*;
-import java.io.*;
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.awt.Color;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.File;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author user
  */
-public class NewJob extends javax.swing.JFrame {
+public class TabbedPane extends javax.swing.JFrame {
 
     /**
-     * Creates new form NewJob
+     * Creates new form TabbedPane
      */
-    public NewJob() {
+    public TabbedPane() {
         initComponents();
         // Check if we're connected to autopwn instance
         CheckConnection();
         // Populate tool list
         PopulateTools();
+        // Populate jobs
+        PopulateJobs();
     }
 
     public boolean PopulateTools() {
@@ -46,6 +59,43 @@ public class NewJob extends javax.swing.JFrame {
             for (int i = 0; i < tools.size(); i++) {
                 JsonObject row = tools.get(i).getAsJsonObject();
                 comboboxTools.addItem(row.get("name").toString());
+            }
+        } catch (Exception exc) {
+            //test
+            System.err.println("error");
+        }
+
+        return true;
+    }
+
+    public boolean PopulateJobs() {
+        String sURL = "http://127.0.0.1:5000/jobs"; //just a string
+        String target_name, target, id, return_code;
+        JsonArray tools;
+
+        // Connect to the URL using java's native library
+        try {
+            URL url = new URL(sURL);
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            request.connect();
+
+            // Convert to a JSON object to print data
+            JsonParser jp = new JsonParser(); //from gson
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
+            tools = rootobj.get("result").getAsJsonArray();
+            DefaultTableModel model = (DefaultTableModel) TableJobs.getModel();
+            for (int i = 0; i < tools.size(); i++) {
+                JsonObject row = tools.get(i).getAsJsonObject();
+                id = row.get("id").toString();
+                target_name = row.get("target_name").toString();
+                target = row.get("target").toString();
+                return_code = row.get("return_code").toString();
+                model.addRow(new Object[]{i});
+                TableJobs.setValueAt(id, i, 0);
+                TableJobs.setValueAt(target_name, i, 1);
+                TableJobs.setValueAt(target, i, 2);
+                TableJobs.setValueAt(return_code, i, 3);
             }
         } catch (Exception exc) {
             //test
@@ -100,7 +150,7 @@ public class NewJob extends javax.swing.JFrame {
             int    postDataLength = postData.length;
             URL url = new URL(sURL);
 
-            HttpURLConnection conn= (HttpURLConnection) url.openConnection();  
+            HttpURLConnection conn= (HttpURLConnection) url.openConnection();
             conn.setDoOutput( true );
             conn.setInstanceFollowRedirects( false );
             conn.setRequestMethod( "POST" );
@@ -111,7 +161,7 @@ public class NewJob extends javax.swing.JFrame {
             try( DataOutputStream wr = new DataOutputStream( conn.getOutputStream())) {
                 wr.write( postData );
             }
-
+            conn.disconnect();
             // Convert to a JSON object to print data
             JsonParser jp = new JsonParser(); //from gson
             JsonElement root = jp.parse(new InputStreamReader((InputStream) conn.getContent())); //Convert the input stream to a json element
@@ -125,9 +175,9 @@ public class NewJob extends javax.swing.JFrame {
         return job_id;
     }
 
-    public boolean RunJob(int job_id) {
+    public int RunJob(int job_id) {
         String sURL = "http://127.0.0.1:5000/jobs/execute"; //just a string
-        
+
         // Connect to the URL using java's native library
         try {
             String urlParameters = "id=" + job_id;
@@ -135,7 +185,7 @@ public class NewJob extends javax.swing.JFrame {
             int    postDataLength = postData.length;
             URL url = new URL(sURL);
 
-            HttpURLConnection conn= (HttpURLConnection) url.openConnection();  
+            HttpURLConnection conn= (HttpURLConnection) url.openConnection();
             conn.setDoOutput( true );
             conn.setInstanceFollowRedirects( false );
             conn.setRequestMethod( "POST" );
@@ -146,18 +196,18 @@ public class NewJob extends javax.swing.JFrame {
             try( DataOutputStream wr = new DataOutputStream( conn.getOutputStream())) {
                 wr.write( postData );
             }
-
+            conn.disconnect();
             // Convert to a JSON object to print data
-            /*JsonParser jp = new JsonParser(); //from gson
+            JsonParser jp = new JsonParser(); //from gson
             JsonElement root = jp.parse(new InputStreamReader((InputStream) conn.getContent())); //Convert the input stream to a json element
             JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object. 
             job_id = rootobj.get("id").getAsInt();
-            System.out.println("Job id: " + job_id);*/
+            System.out.println("Job id: " + job_id);
         } catch (Exception exc) {
             //test
         }
 
-        return true;
+        return 1;
     }
 
     /**
@@ -169,6 +219,8 @@ public class NewJob extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        TabbedAutopwn = new javax.swing.JTabbedPane();
+        PanelNewJob = new javax.swing.JPanel();
         textfieldTargetName = new javax.swing.JTextField();
         textfieldTarget = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -192,6 +244,10 @@ public class NewJob extends javax.swing.JFrame {
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
+        PanelJobs = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        TableJobs = new javax.swing.JTable();
+        ButtonSaveExport = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -249,21 +305,21 @@ public class NewJob extends javax.swing.JFrame {
 
         jLabel16.setText("url");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+        javax.swing.GroupLayout PanelNewJobLayout = new javax.swing.GroupLayout(PanelNewJob);
+        PanelNewJob.setLayout(PanelNewJobLayout);
+        PanelNewJobLayout.setHorizontalGroup(
+            PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelNewJobLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(buttonRun, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelNewJobLayout.createSequentialGroup()
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(labelConnectionStatus))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelNewJobLayout.createSequentialGroup()
+                        .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING)
@@ -275,7 +331,7 @@ public class NewJob extends javax.swing.JFrame {
                             .addComponent(jLabel15)
                             .addComponent(jLabel16))
                         .addGap(12, 12, 12)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(textfieldUserFile)
                             .addComponent(textfieldUser)
                             .addComponent(textfieldPassword)
@@ -283,61 +339,112 @@ public class NewJob extends javax.swing.JFrame {
                             .addComponent(textfieldTargetName)
                             .addComponent(textfieldTarget)
                             .addComponent(comboboxTools, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(formattedtextfieldPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE)
+                            .addComponent(formattedtextfieldPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
                             .addComponent(textfieldProtocol)
                             .addComponent(textfieldURL))))
                 .addContainerGap())
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+        PanelNewJobLayout.setVerticalGroup(
+            PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelNewJobLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(labelConnectionStatus))
                 .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(comboboxTools, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(textfieldTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
                     .addComponent(textfieldTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel6)
                     .addComponent(formattedtextfieldPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textfieldPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textfieldPasswordFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
                     .addComponent(textfieldUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
                     .addComponent(textfieldUserFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel15)
                     .addComponent(textfieldProtocol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel16)
                     .addComponent(textfieldURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRun)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        TabbedAutopwn.addTab("New", PanelNewJob);
+
+        TableJobs.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Name", "Target", "Return Code"
+            }
+        ));
+        jScrollPane1.setViewportView(TableJobs);
+
+        ButtonSaveExport.setText("Export");
+        ButtonSaveExport.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ButtonSaveExportMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout PanelJobsLayout = new javax.swing.GroupLayout(PanelJobs);
+        PanelJobs.setLayout(PanelJobsLayout);
+        PanelJobsLayout.setHorizontalGroup(
+            PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1)
+            .addGroup(PanelJobsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ButtonSaveExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        PanelJobsLayout.setVerticalGroup(
+            PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelJobsLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ButtonSaveExport)
+                .addContainerGap())
+        );
+
+        TabbedAutopwn.addTab("Jobs", PanelJobs);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(TabbedAutopwn)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(TabbedAutopwn)
         );
 
         pack();
@@ -346,8 +453,54 @@ public class NewJob extends javax.swing.JFrame {
     private void buttonRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunMouseClicked
         // Run job
         int job_id = SaveJob();
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
         RunJob(job_id);
     }//GEN-LAST:event_buttonRunMouseClicked
+
+    private void ButtonSaveExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonSaveExportMouseClicked
+        // TODO add your handling code here:
+        String job_id = TableJobs.getValueAt(TableJobs.getSelectedRow(), 0).toString();
+        System.out.println(job_id);
+        String sURL = "http://127.0.0.1:5000/exports/" + job_id; //just a string
+        String message;
+        InputStream fileContent;
+        byte[] buffer = new byte[4096];
+        int n = -1;
+        
+        // Connect to the URL using java's native library
+        try {
+            URL url = new URL(sURL);
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            request.connect();
+            fileContent = request.getInputStream();
+
+            // parent component of the dialog
+            JFrame parentFrame = new JFrame();
+ 
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Specify a file to save");   
+ 
+            int userSelection = fileChooser.showSaveDialog(parentFrame);
+ 
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+
+                OutputStream output = new FileOutputStream(fileToSave);
+                while ((n = fileContent.read(buffer)) != -1)
+                {
+                    output.write(buffer, 0, n);
+                }
+                output.close();
+            }
+        } catch (Exception anexc) {
+            // something
+        }
+    }//GEN-LAST:event_ButtonSaveExportMouseClicked
 
     /**
      * @param args the command line arguments
@@ -366,25 +519,30 @@ public class NewJob extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewJob.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TabbedPane.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewJob.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TabbedPane.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewJob.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TabbedPane.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewJob.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TabbedPane.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new NewJob().setVisible(true);
+                new TabbedPane().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ButtonSaveExport;
+    private javax.swing.JPanel PanelJobs;
+    private javax.swing.JPanel PanelNewJob;
+    private javax.swing.JTabbedPane TabbedAutopwn;
+    private javax.swing.JTable TableJobs;
     private javax.swing.JButton buttonRun;
     private javax.swing.JComboBox<String> comboboxTools;
     private javax.swing.JFormattedTextField formattedtextfieldPortNumber;
@@ -399,6 +557,7 @@ public class NewJob extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelConnectionStatus;
     private javax.swing.JTextField textfieldPassword;
     private javax.swing.JTextField textfieldPasswordFile;
