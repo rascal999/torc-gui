@@ -37,8 +37,12 @@ public class TabbedPane extends javax.swing.JFrame {
         CheckConnection();
         // Populate tool list
         PopulateTools();
-        // Populate jobs
-        PopulateJobs();
+        // Populate assessment list
+        PopulateAssessments();
+        // Populate tool jobs
+        PopulateToolJobs();
+        // Populate assessment jobs
+        PopulateAssessmentJobs();
     }
 
     public boolean PopulateTools() {
@@ -68,9 +72,8 @@ public class TabbedPane extends javax.swing.JFrame {
         return true;
     }
 
-    public boolean PopulateJobs() {
-        String sURL = "http://127.0.0.1:5000/jobs"; //just a string
-        String target_name, target, id, return_code;
+    public boolean PopulateAssessments() {
+        String sURL = "http://127.0.0.1:5000/assessments"; //just a string
         JsonArray tools;
 
         // Connect to the URL using java's native library
@@ -84,7 +87,46 @@ public class TabbedPane extends javax.swing.JFrame {
             JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
             JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
             tools = rootobj.get("result").getAsJsonArray();
-            DefaultTableModel model = (DefaultTableModel) TableJobs.getModel();
+            for (int i = 0; i < tools.size(); i++) {
+                JsonObject row = tools.get(i).getAsJsonObject();
+                comboboxTools.addItem(row.get("name").toString());
+            }
+        } catch (Exception exc) {
+            //test
+            System.err.println("error");
+        }
+
+        return true;
+    }
+    
+    public boolean PopulateToolJobs() {
+        String sURL = "http://127.0.0.1:5000/tools/jobs"; //just a string
+        String target_name, target, id, return_code;
+        JsonArray tools;
+        int k;
+
+        // Connect to the URL using java's native library
+        try {
+            URL url = new URL(sURL);
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            request.setUseCaches(false);
+            request.connect();
+            request.disconnect();
+
+            // Convert to a JSON object to print data
+            JsonParser jp = new JsonParser(); //from gson
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
+            tools = rootobj.get("result").getAsJsonArray();
+            System.out.println(tools);
+            DefaultTableModel model = (DefaultTableModel) TableToolJobs.getModel();
+            // Remove rows
+            if (model.getRowCount() > 0) {
+                for (int i = model.getRowCount() - 1; i > -1; i--) {
+                    model.removeRow(i);
+                }
+            }
+
             for (int i = 0; i < tools.size(); i++) {
                 JsonObject row = tools.get(i).getAsJsonObject();
                 id = row.get("id").toString();
@@ -92,14 +134,62 @@ public class TabbedPane extends javax.swing.JFrame {
                 target = row.get("target").toString();
                 return_code = row.get("return_code").toString();
                 model.addRow(new Object[]{i});
-                TableJobs.setValueAt(id, i, 0);
-                TableJobs.setValueAt(target_name, i, 1);
-                TableJobs.setValueAt(target, i, 2);
-                TableJobs.setValueAt(return_code, i, 3);
+                TableToolJobs.setValueAt(id, i, 0);
+                TableToolJobs.setValueAt(target_name, i, 1);
+                TableToolJobs.setValueAt(target, i, 2);
+                TableToolJobs.setValueAt(return_code, i, 3);
             }
         } catch (Exception exc) {
             //test
-            System.err.println("error");
+            System.err.println("error" + exc);
+        }
+
+        return true;
+    }
+    
+    public boolean PopulateAssessmentJobs() {
+        String sURL = "http://127.0.0.1:5000/assessments/jobs"; //just a string
+        String target_name, target, id, return_code;
+        JsonArray tools;
+        int k;
+
+        // Connect to the URL using java's native library
+        try {
+            URL url = new URL(sURL);
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            request.setUseCaches(false);
+            request.connect();
+            request.disconnect();
+
+            // Convert to a JSON object to print data
+            JsonParser jp = new JsonParser(); //from gson
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
+            tools = rootobj.get("result").getAsJsonArray();
+            System.out.println(tools);
+            DefaultTableModel model = (DefaultTableModel) TableAssessmentJobs.getModel();
+            // Remove rows
+            if (model.getRowCount() > 0) {
+                for (int i = model.getRowCount() - 1; i > -1; i--) {
+                    model.removeRow(i);
+                }
+            }
+
+            for (int i = 0; i < tools.size(); i++) {
+                JsonObject row = tools.get(i).getAsJsonObject();
+                id = row.get("id").toString();
+                target_name = row.get("target_name").toString();
+                target = row.get("target").toString();
+                return_code = row.get("return_code").toString();
+                model.addRow(new Object[]{i});
+                TableAssessmentJobs.setValueAt(id, i, 0);
+                TableAssessmentJobs.setValueAt(target_name, i, 1);
+                TableAssessmentJobs.setValueAt(target, i, 2);
+                TableAssessmentJobs.setValueAt(return_code, i, 3);
+            }
+        } catch (Exception exc) {
+            //test
+            System.err.println("error" + exc);
         }
 
         return true;
@@ -130,9 +220,54 @@ public class TabbedPane extends javax.swing.JFrame {
 
         return true;
     }
+
+    public int SaveAssessmentJob() {
+        String sURL = "http://127.0.0.1:5000/assessments/jobs"; //just a string
+        int job_id = 0;
+        
+        // Connect to the URL using java's native library
+        try {
+            // TODO Fix
+            String urlParameters = "assessment=" + 1 +
+                    "&target=" + textfieldTarget.getText() +
+                    "&target_name=" + textfieldTargetName.getText() +
+                    "&protocol=" + textfieldProtocol.getText() +
+                    "&port_number=" + formattedtextfieldPortNumber.getText() +
+                    "&user=" + textfieldUser.getText() +
+                    "&password=" + textfieldPassword.getText() +
+                    "&user_file=" + textfieldUserFile.getText() +
+                    "&password_file=" + textfieldPasswordFile.getText();
+            byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
+            int    postDataLength = postData.length;
+            URL url = new URL(sURL);
+
+            HttpURLConnection conn= (HttpURLConnection) url.openConnection();
+            conn.setDoOutput( true );
+            conn.setInstanceFollowRedirects( false );
+            conn.setRequestMethod( "POST" );
+            conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
+            conn.setRequestProperty( "charset", "utf-8");
+            conn.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+            conn.setUseCaches( false );
+            try( DataOutputStream wr = new DataOutputStream( conn.getOutputStream())) {
+                wr.write( postData );
+            }
+            conn.disconnect();
+            // Convert to a JSON object to print data
+            JsonParser jp = new JsonParser(); //from gson
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) conn.getContent())); //Convert the input stream to a json element
+            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object. 
+            job_id = rootobj.get("id").getAsInt();
+            System.out.println("Job id: " + job_id);
+        } catch (Exception exc) {
+            //test
+        }
+
+        return job_id;
+    }
     
-    public int SaveJob() {
-        String sURL = "http://127.0.0.1:5000/jobs"; //just a string
+    public int SaveToolJob() {
+        String sURL = "http://127.0.0.1:5000/tools/jobs"; //just a string
         int job_id = 0;
         
         // Connect to the URL using java's native library
@@ -175,8 +310,43 @@ public class TabbedPane extends javax.swing.JFrame {
         return job_id;
     }
 
-    public int RunJob(int job_id) {
-        String sURL = "http://127.0.0.1:5000/jobs/execute"; //just a string
+    public int RunAssessmentJob(int job_id) {
+        String sURL = "http://127.0.0.1:5000/assessments/jobs/execute"; //just a string
+
+        // Connect to the URL using java's native library
+        try {
+            String urlParameters = "id=" + job_id;
+            byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
+            int    postDataLength = postData.length;
+            URL url = new URL(sURL);
+
+            HttpURLConnection conn= (HttpURLConnection) url.openConnection();
+            conn.setDoOutput( true );
+            conn.setInstanceFollowRedirects( false );
+            conn.setRequestMethod( "POST" );
+            conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
+            conn.setRequestProperty( "charset", "utf-8");
+            conn.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+            conn.setUseCaches( false );
+            try( DataOutputStream wr = new DataOutputStream( conn.getOutputStream())) {
+                wr.write( postData );
+            }
+            conn.disconnect();
+            // Convert to a JSON object to print data
+            JsonParser jp = new JsonParser(); //from gson
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) conn.getContent())); //Convert the input stream to a json element
+            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object. 
+            job_id = rootobj.get("id").getAsInt();
+            System.out.println("Job id: " + job_id);
+        } catch (Exception exc) {
+            //test
+        }
+
+        return 1;
+    }
+
+    public int RunToolJob(int job_id) {
+        String sURL = "http://127.0.0.1:5000/tools/jobs/execute"; //just a string
 
         // Connect to the URL using java's native library
         try {
@@ -246,14 +416,18 @@ public class TabbedPane extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         PanelJobs = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        TableJobs = new javax.swing.JTable();
-        ButtonSaveExport = new javax.swing.JButton();
+        TableToolJobs = new javax.swing.JTable();
+        ButtonAssessmentExport = new javax.swing.JButton();
+        ButtonRefreshTable = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        TableAssessmentJobs = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        ButtonToolExport = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        textfieldTargetName.setText("jTextField1");
-
-        textfieldTarget.setText("jTextField2");
+        textfieldTarget.setToolTipText("");
 
         jLabel2.setText("target_name");
 
@@ -262,14 +436,6 @@ public class TabbedPane extends javax.swing.JFrame {
         jLabel6.setText("port_number");
 
         jLabel7.setText("password_file");
-
-        textfieldPasswordFile.setText("jTextField4");
-
-        textfieldUserFile.setText("jTextField5");
-
-        textfieldProtocol.setText("jTextField6");
-
-        textfieldURL.setText("jTextField7");
 
         jLabel8.setText("Autopwn GUI v0.1.0");
 
@@ -289,13 +455,7 @@ public class TabbedPane extends javax.swing.JFrame {
         labelConnectionStatus.setText("Not Connected!");
         labelConnectionStatus.setName("labelConnectionStatus"); // NOI18N
 
-        formattedtextfieldPortNumber.setText("jFormattedTextField1");
-
-        textfieldUser.setText("jTextField5");
-
         jLabel12.setText("password");
-
-        textfieldPassword.setText("jTextField4");
 
         jLabel13.setText("user");
 
@@ -360,13 +520,13 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(textfieldTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(textfieldTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(formattedtextfieldPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(formattedtextfieldPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textfieldPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -393,12 +553,12 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(textfieldURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRun)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(74, Short.MAX_VALUE))
         );
 
         TabbedAutopwn.addTab("New", PanelNewJob);
 
-        TableJobs.setModel(new javax.swing.table.DefaultTableModel(
+        TableToolJobs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -406,12 +566,40 @@ public class TabbedPane extends javax.swing.JFrame {
                 "ID", "Name", "Target", "Return Code"
             }
         ));
-        jScrollPane1.setViewportView(TableJobs);
+        jScrollPane1.setViewportView(TableToolJobs);
 
-        ButtonSaveExport.setText("Export");
-        ButtonSaveExport.addMouseListener(new java.awt.event.MouseAdapter() {
+        ButtonAssessmentExport.setText("Export");
+        ButtonAssessmentExport.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ButtonSaveExportMouseClicked(evt);
+                ButtonAssessmentExportMouseClicked(evt);
+            }
+        });
+
+        ButtonRefreshTable.setText("Refresh tables");
+        ButtonRefreshTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ButtonRefreshTableMouseClicked(evt);
+            }
+        });
+
+        TableAssessmentJobs.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Name", "Target", "Return Code"
+            }
+        ));
+        jScrollPane2.setViewportView(TableAssessmentJobs);
+
+        jLabel1.setText("Assessment Jobs");
+
+        jLabel3.setText("Tool Jobs");
+
+        ButtonToolExport.setText("Export");
+        ButtonToolExport.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ButtonToolExportMouseClicked(evt);
             }
         });
 
@@ -419,19 +607,41 @@ public class TabbedPane extends javax.swing.JFrame {
         PanelJobs.setLayout(PanelJobsLayout);
         PanelJobsLayout.setHorizontalGroup(
             PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
             .addGroup(PanelJobsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ButtonSaveExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelJobsLayout.createSequentialGroup()
+                        .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(ButtonRefreshTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(ButtonToolExport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+                            .addComponent(ButtonAssessmentExport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .addGroup(PanelJobsLayout.createSequentialGroup()
+                        .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel1))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         PanelJobsLayout.setVerticalGroup(
             PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelJobsLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelJobsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ButtonSaveExport)
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ButtonToolExport)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ButtonAssessmentExport)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ButtonRefreshTable)
+                .addGap(21, 21, 21))
         );
 
         TabbedAutopwn.addTab("Jobs", PanelJobs);
@@ -452,25 +662,26 @@ public class TabbedPane extends javax.swing.JFrame {
 
     private void buttonRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunMouseClicked
         // Run job
-        int job_id = SaveJob();
+        int job_id = SaveAssessmentJob();
         try {
             Thread.sleep(1000);                 //1000 milliseconds is one second.
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        RunJob(job_id);
+        RunAssessmentJob(job_id);
     }//GEN-LAST:event_buttonRunMouseClicked
 
-    private void ButtonSaveExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonSaveExportMouseClicked
+    private void ButtonToolExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonToolExportMouseClicked
         // TODO add your handling code here:
-        String job_id = TableJobs.getValueAt(TableJobs.getSelectedRow(), 0).toString();
+        // TODO add your handling code here:
+        String job_id = TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 0).toString();
         System.out.println(job_id);
-        String sURL = "http://127.0.0.1:5000/exports/" + job_id; //just a string
+        String sURL = "http://127.0.0.1:5000/tools/exports/" + job_id; //just a string
         String message;
         InputStream fileContent;
         byte[] buffer = new byte[4096];
         int n = -1;
-        
+
         // Connect to the URL using java's native library
         try {
             URL url = new URL(sURL);
@@ -480,12 +691,12 @@ public class TabbedPane extends javax.swing.JFrame {
 
             // parent component of the dialog
             JFrame parentFrame = new JFrame();
- 
+
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Specify a file to save");   
- 
+            fileChooser.setDialogTitle("Specify a file to save");
+
             int userSelection = fileChooser.showSaveDialog(parentFrame);
- 
+
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
                 System.out.println("Save as file: " + fileToSave.getAbsolutePath());
@@ -500,7 +711,56 @@ public class TabbedPane extends javax.swing.JFrame {
         } catch (Exception anexc) {
             // something
         }
-    }//GEN-LAST:event_ButtonSaveExportMouseClicked
+    }//GEN-LAST:event_ButtonToolExportMouseClicked
+
+    private void ButtonRefreshTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonRefreshTableMouseClicked
+        // TODO add your handling code here:
+        // Populate tool jobs
+        PopulateToolJobs();
+        // Populate assessment jobs
+        PopulateAssessmentJobs();
+    }//GEN-LAST:event_ButtonRefreshTableMouseClicked
+
+    private void ButtonAssessmentExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonAssessmentExportMouseClicked
+        // TODO add your handling code here:
+        String job_id = TableAssessmentJobs.getValueAt(TableAssessmentJobs.getSelectedRow(), 0).toString();
+        System.out.println(job_id);
+        String sURL = "http://127.0.0.1:5000/assessments/exports/" + job_id; //just a string
+        String message;
+        InputStream fileContent;
+        byte[] buffer = new byte[4096];
+        int n = -1;
+
+        // Connect to the URL using java's native library
+        try {
+            URL url = new URL(sURL);
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            request.connect();
+            fileContent = request.getInputStream();
+
+            // parent component of the dialog
+            JFrame parentFrame = new JFrame();
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Specify a file to save");
+
+            int userSelection = fileChooser.showSaveDialog(parentFrame);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+
+                OutputStream output = new FileOutputStream(fileToSave);
+                while ((n = fileContent.read(buffer)) != -1)
+                {
+                    output.write(buffer, 0, n);
+                }
+                output.close();
+            }
+        } catch (Exception anexc) {
+            // something
+        }
+    }//GEN-LAST:event_ButtonAssessmentExportMouseClicked
 
     /**
      * @param args the command line arguments
@@ -538,26 +798,32 @@ public class TabbedPane extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ButtonSaveExport;
+    private javax.swing.JButton ButtonAssessmentExport;
+    private javax.swing.JButton ButtonRefreshTable;
+    private javax.swing.JButton ButtonToolExport;
     private javax.swing.JPanel PanelJobs;
     private javax.swing.JPanel PanelNewJob;
     private javax.swing.JTabbedPane TabbedAutopwn;
-    private javax.swing.JTable TableJobs;
+    private javax.swing.JTable TableAssessmentJobs;
+    private javax.swing.JTable TableToolJobs;
     private javax.swing.JButton buttonRun;
     private javax.swing.JComboBox<String> comboboxTools;
     private javax.swing.JFormattedTextField formattedtextfieldPortNumber;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel labelConnectionStatus;
     private javax.swing.JTextField textfieldPassword;
     private javax.swing.JTextField textfieldPasswordFile;
