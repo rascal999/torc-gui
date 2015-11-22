@@ -60,7 +60,7 @@ public class TabbedPane extends javax.swing.JFrame {
             tools = rootobj.get("result").getAsJsonArray();
             for (int i = 0; i < tools.size(); i++) {
                 JsonObject row = tools.get(i).getAsJsonObject();
-                comboboxRunToolTools.addItem(row.get("name").toString());
+                comboboxRunToolTools.addItem(row.get("name").toString().replaceAll("^\"|\"$", ""));
             }
         } catch (Exception exc) {
             //test
@@ -87,7 +87,7 @@ public class TabbedPane extends javax.swing.JFrame {
             tools = rootobj.get("result").getAsJsonArray();
             for (int i = 0; i < tools.size(); i++) {
                 JsonObject row = tools.get(i).getAsJsonObject();
-                comboboxRunAssessmentAssessments.addItem(row.get("name").toString());
+                comboboxRunAssessmentAssessments.addItem(row.get("name").toString().replaceAll("^\"|\"$", ""));
             }
         } catch (Exception exc) {
             //test
@@ -152,11 +152,11 @@ public class TabbedPane extends javax.swing.JFrame {
 
             for (int i = 0; i < tools.size(); i++) {
                 JsonObject row = tools.get(i).getAsJsonObject();
-                id = row.get("id").toString();
-                target_name = row.get("target_name").toString();
-                tool_name = getToolById(row.get("tool").getAsInt());
-                target = row.get("target").toString();
-                return_code = row.get("return_code").toString();
+                id = row.get("id").toString().replaceAll("^\"|\"$", "");
+                target_name = row.get("target_name").toString().replaceAll("^\"|\"$", "");
+                tool_name = getToolById(row.get("tool").getAsInt()).replaceAll("^\"|\"$", "");
+                target = row.get("target").toString().replaceAll("^\"|\"$", "");
+                return_code = row.get("return_code").toString().replaceAll("^\"|\"$", "");
                 model.addRow(new Object[]{i});
                 TableToolJobs.setValueAt(id, i, 0);
                 TableToolJobs.setValueAt(target_name, i, 1);
@@ -744,9 +744,9 @@ public class TabbedPane extends javax.swing.JFrame {
     private void ButtonToolExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonToolExportMouseClicked
         // TODO add your handling code here:
         // TODO add your handling code here:
-        String job_id = TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 0).toString();
-        System.out.println(job_id);
-        String sURL = "http://127.0.0.1:5000/tools/exports/" + job_id; //just a string
+        String defaultFileName, jobId = TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 0).toString();
+        System.out.println(jobId);
+        String sURL = "http://127.0.0.1:5000/tools/jobs/exports/" + jobId; //just a string
         String message;
         InputStream fileContent;
         byte[] buffer = new byte[4096];
@@ -762,7 +762,15 @@ public class TabbedPane extends javax.swing.JFrame {
             // parent component of the dialog
             JFrame parentFrame = new JFrame();
 
+            defaultFileName = TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 3).toString() +
+                                "_" + TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 2).toString() +
+                                ".zip";
+            // New file path
+            File fileToSavePath = new File(System.getProperty("user.home") + "/" + defaultFileName);
+            // New fileChooser
             JFileChooser fileChooser = new JFileChooser();
+            // Set fileChooser path to file
+            fileChooser.setSelectedFile(fileToSavePath);
             fileChooser.setDialogTitle("Specify a file to save");
 
             int userSelection = fileChooser.showSaveDialog(parentFrame);
