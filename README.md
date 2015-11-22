@@ -36,4 +36,4 @@ export tool results from here and save them to your disk.
 
 ## Credits
 
-Developed by Aidan Marlin (aidan [dot] marlin [at] nccgroup [dot] com).
+Developed by Aidan Marlin (aidan [dot] marlin [at] gmail [dot] com).
