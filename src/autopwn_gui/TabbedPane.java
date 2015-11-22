@@ -41,11 +41,9 @@ public class TabbedPane extends javax.swing.JFrame {
         PopulateAssessments();
         // Populate tool jobs
         PopulateToolJobs();
-        // Populate assessment jobs
-        PopulateAssessmentJobs();
     }
 
-    public boolean PopulateTools() {
+    public final boolean PopulateTools() {
         String sURL = "http://127.0.0.1:5000/tools"; //just a string
         JsonArray tools;
 
@@ -62,7 +60,7 @@ public class TabbedPane extends javax.swing.JFrame {
             tools = rootobj.get("result").getAsJsonArray();
             for (int i = 0; i < tools.size(); i++) {
                 JsonObject row = tools.get(i).getAsJsonObject();
-                comboboxTools.addItem(row.get("name").toString());
+                comboboxRunToolTools.addItem(row.get("name").toString());
             }
         } catch (Exception exc) {
             //test
@@ -72,7 +70,7 @@ public class TabbedPane extends javax.swing.JFrame {
         return true;
     }
 
-    public boolean PopulateAssessments() {
+    public final boolean PopulateAssessments() {
         String sURL = "http://127.0.0.1:5000/assessments"; //just a string
         JsonArray tools;
 
@@ -89,7 +87,7 @@ public class TabbedPane extends javax.swing.JFrame {
             tools = rootobj.get("result").getAsJsonArray();
             for (int i = 0; i < tools.size(); i++) {
                 JsonObject row = tools.get(i).getAsJsonObject();
-                comboboxTools.addItem(row.get("name").toString());
+                comboboxRunAssessmentAssessments.addItem(row.get("name").toString());
             }
         } catch (Exception exc) {
             //test
@@ -99,9 +97,34 @@ public class TabbedPane extends javax.swing.JFrame {
         return true;
     }
     
-    public boolean PopulateToolJobs() {
+    public final String getToolById(int tool_id) {
+        String toolName = "error", sURL = "http://127.0.0.1:5000/tools/" + tool_id; //just a string
+        JsonArray tools;
+
+        // Connect to the URL using java's native library
+        try {
+            URL url = new URL(sURL);
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            request.connect();
+
+            // Convert to a JSON object to print data
+            JsonParser jp = new JsonParser(); //from gson
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
+            tools = rootobj.get("result").getAsJsonArray();
+            JsonObject row = tools.get(0).getAsJsonObject();
+            toolName = (row.get("name").toString());
+        } catch (Exception exc) {
+            //test
+            System.err.println("error");
+        }
+
+        return toolName;
+    }
+
+    public final boolean PopulateToolJobs() {
         String sURL = "http://127.0.0.1:5000/tools/jobs"; //just a string
-        String target_name, target, id, return_code;
+        String target_name, tool_name, target, id, return_code;
         JsonArray tools;
         int k;
 
@@ -131,13 +154,15 @@ public class TabbedPane extends javax.swing.JFrame {
                 JsonObject row = tools.get(i).getAsJsonObject();
                 id = row.get("id").toString();
                 target_name = row.get("target_name").toString();
+                tool_name = getToolById(row.get("tool").getAsInt());
                 target = row.get("target").toString();
                 return_code = row.get("return_code").toString();
                 model.addRow(new Object[]{i});
                 TableToolJobs.setValueAt(id, i, 0);
                 TableToolJobs.setValueAt(target_name, i, 1);
-                TableToolJobs.setValueAt(target, i, 2);
-                TableToolJobs.setValueAt(return_code, i, 3);
+                TableToolJobs.setValueAt(tool_name, i, 2);
+                TableToolJobs.setValueAt(target, i, 3);
+                TableToolJobs.setValueAt(return_code, i, 4);
             }
         } catch (Exception exc) {
             //test
@@ -147,55 +172,7 @@ public class TabbedPane extends javax.swing.JFrame {
         return true;
     }
     
-    public boolean PopulateAssessmentJobs() {
-        String sURL = "http://127.0.0.1:5000/assessments/jobs"; //just a string
-        String target_name, target, id, return_code;
-        JsonArray tools;
-        int k;
-
-        // Connect to the URL using java's native library
-        try {
-            URL url = new URL(sURL);
-            HttpURLConnection request = (HttpURLConnection) url.openConnection();
-            request.setUseCaches(false);
-            request.connect();
-            request.disconnect();
-
-            // Convert to a JSON object to print data
-            JsonParser jp = new JsonParser(); //from gson
-            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
-            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
-            tools = rootobj.get("result").getAsJsonArray();
-            System.out.println(tools);
-            DefaultTableModel model = (DefaultTableModel) TableAssessmentJobs.getModel();
-            // Remove rows
-            if (model.getRowCount() > 0) {
-                for (int i = model.getRowCount() - 1; i > -1; i--) {
-                    model.removeRow(i);
-                }
-            }
-
-            for (int i = 0; i < tools.size(); i++) {
-                JsonObject row = tools.get(i).getAsJsonObject();
-                id = row.get("id").toString();
-                target_name = row.get("target_name").toString();
-                target = row.get("target").toString();
-                return_code = row.get("return_code").toString();
-                model.addRow(new Object[]{i});
-                TableAssessmentJobs.setValueAt(id, i, 0);
-                TableAssessmentJobs.setValueAt(target_name, i, 1);
-                TableAssessmentJobs.setValueAt(target, i, 2);
-                TableAssessmentJobs.setValueAt(return_code, i, 3);
-            }
-        } catch (Exception exc) {
-            //test
-            System.err.println("error" + exc);
-        }
-
-        return true;
-    }
-    
-    public boolean CheckConnection() {
+    public final boolean CheckConnection() {
         String sURL = "http://127.0.0.1:5000/ping"; //just a string
         String message;
         
@@ -211,8 +188,10 @@ public class TabbedPane extends javax.swing.JFrame {
             JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object. 
             message = rootobj.get("message").getAsString();
             if (message.equals("pong")) {
-                labelConnectionStatus.setForeground(Color.green);
-                labelConnectionStatus.setText("Connected!");
+                labelRunToolConnectionStatus.setForeground(Color.green);
+                labelRunToolConnectionStatus.setText("Connected!");
+                labelRunAssessmentConnectionStatus.setForeground(Color.green);
+                labelRunAssessmentConnectionStatus.setText("Connected!");
             }
         } catch (Exception exc) {
             //test
@@ -221,70 +200,41 @@ public class TabbedPane extends javax.swing.JFrame {
         return true;
     }
 
-    public int SaveAssessmentJob() {
-        String sURL = "http://127.0.0.1:5000/assessments/jobs"; //just a string
-        int job_id = 0;
-        
-        // Connect to the URL using java's native library
-        try {
-            // TODO Fix
-            String urlParameters = "assessment=" + 1 +
-                    "&target=" + textfieldTarget.getText() +
-                    "&target_name=" + textfieldTargetName.getText() +
-                    "&protocol=" + textfieldProtocol.getText() +
-                    "&port_number=" + formattedtextfieldPortNumber.getText() +
-                    "&user=" + textfieldUser.getText() +
-                    "&password=" + textfieldPassword.getText() +
-                    "&user_file=" + textfieldUserFile.getText() +
-                    "&password_file=" + textfieldPasswordFile.getText();
-            byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
-            int    postDataLength = postData.length;
-            URL url = new URL(sURL);
-
-            HttpURLConnection conn= (HttpURLConnection) url.openConnection();
-            conn.setDoOutput( true );
-            conn.setInstanceFollowRedirects( false );
-            conn.setRequestMethod( "POST" );
-            conn.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
-            conn.setRequestProperty( "charset", "utf-8");
-            conn.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
-            conn.setUseCaches( false );
-            try( DataOutputStream wr = new DataOutputStream( conn.getOutputStream())) {
-                wr.write( postData );
-            }
-            conn.disconnect();
-            // Convert to a JSON object to print data
-            JsonParser jp = new JsonParser(); //from gson
-            JsonElement root = jp.parse(new InputStreamReader((InputStream) conn.getContent())); //Convert the input stream to a json element
-            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object. 
-            job_id = rootobj.get("id").getAsInt();
-            System.out.println("Job id: " + job_id);
-        } catch (Exception exc) {
-            //test
-        }
-
-        return job_id;
-    }
-    
-    public int SaveToolJob() {
+    public final int SaveToolJob(int param_tool_id) {
         String sURL = "http://127.0.0.1:5000/tools/jobs"; //just a string
-        int job_id = 0;
+        int job_id = 0, tool_id = 0;
+        String urlParameters;
         
-        // Connect to the URL using java's native library
+        // Depending on which panel is visible we need the contents of the text field in that panel
         try {
-            String urlParameters = "tool=" + comboboxTools.getSelectedIndex() +
-                    "&target=" + textfieldTarget.getText() +
-                    "&target_name=" + textfieldTargetName.getText() +
-                    "&protocol=" + textfieldProtocol.getText() +
-                    "&port_number=" + formattedtextfieldPortNumber.getText() +
-                    "&user=" + textfieldUser.getText() +
-                    "&password=" + textfieldPassword.getText() +
-                    "&user_file=" + textfieldUserFile.getText() +
-                    "&password_file=" + textfieldPasswordFile.getText();
+            if (PanelRunTool.isVisible() ==  true){
+                 urlParameters = "tool=" + comboboxRunToolTools.getSelectedIndex() +
+                        "&target=" + textfieldRunToolTarget.getText() +
+                        "&target_name=" + textfieldRunToolTargetName.getText() +
+                        "&protocol=" + textfieldRunToolProtocol.getText() +
+                        "&port_number=" + formattedtextfieldRunToolPortNumber.getText() +
+                        "&user=" + textfieldRunToolUser.getText() +
+                        "&password=" + textfieldRunToolPassword.getText() +
+                        "&user_file=" + textfieldRunToolUserFile.getText() +
+                        "&password_file=" + textfieldRunToolPasswordFile.getText();
+            } else {
+                tool_id = param_tool_id;
+                urlParameters = "tool=" + tool_id +
+                        "&target=" + textfieldRunAssessmentTarget.getText() +
+                        "&target_name=" + textfieldRunAssessmentTargetName.getText() +
+                        "&protocol=" + textfieldRunAssessmentProtocol.getText() +
+                        "&port_number=" + formattedtextfieldRunAssessmentPortNumber.getText() +
+                        "&user=" + textfieldRunAssessmentUser.getText() +
+                        "&password=" + textfieldRunAssessmentPassword.getText() +
+                        "&user_file=" + textfieldRunAssessmentUserFile.getText() +
+                        "&password_file=" + textfieldRunAssessmentPasswordFile.getText();
+            }
+
             byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
             int    postDataLength = postData.length;
             URL url = new URL(sURL);
 
+            // Connect to the URL using java's native library
             HttpURLConnection conn= (HttpURLConnection) url.openConnection();
             conn.setDoOutput( true );
             conn.setInstanceFollowRedirects( false );
@@ -310,7 +260,7 @@ public class TabbedPane extends javax.swing.JFrame {
         return job_id;
     }
 
-    public int RunAssessmentJob(int job_id) {
+    public final int RunAssessmentJob(int job_id) {
         String sURL = "http://127.0.0.1:5000/assessments/jobs/execute"; //just a string
 
         // Connect to the URL using java's native library
@@ -390,44 +340,64 @@ public class TabbedPane extends javax.swing.JFrame {
     private void initComponents() {
 
         TabbedAutopwn = new javax.swing.JTabbedPane();
-        PanelNewJob = new javax.swing.JPanel();
-        textfieldTargetName = new javax.swing.JTextField();
-        textfieldTarget = new javax.swing.JTextField();
+        PanelRunTool = new javax.swing.JPanel();
+        textfieldRunToolTargetName = new javax.swing.JTextField();
+        textfieldRunToolTarget = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        textfieldPasswordFile = new javax.swing.JTextField();
-        textfieldUserFile = new javax.swing.JTextField();
-        textfieldProtocol = new javax.swing.JTextField();
-        textfieldURL = new javax.swing.JTextField();
+        textfieldRunToolPasswordFile = new javax.swing.JTextField();
+        textfieldRunToolUserFile = new javax.swing.JTextField();
+        textfieldRunToolProtocol = new javax.swing.JTextField();
+        textfieldRunToolURL = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        comboboxTools = new javax.swing.JComboBox<>();
+        comboboxRunToolTools = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
-        buttonRun = new javax.swing.JButton();
-        labelConnectionStatus = new javax.swing.JLabel();
-        formattedtextfieldPortNumber = new javax.swing.JFormattedTextField();
-        textfieldUser = new javax.swing.JTextField();
+        buttonRunToolRun = new javax.swing.JButton();
+        labelRunToolConnectionStatus = new javax.swing.JLabel();
+        formattedtextfieldRunToolPortNumber = new javax.swing.JFormattedTextField();
+        textfieldRunToolUser = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
-        textfieldPassword = new javax.swing.JTextField();
+        textfieldRunToolPassword = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
+        PanelRunAssessment = new javax.swing.JPanel();
+        textfieldRunAssessmentTargetName = new javax.swing.JTextField();
+        textfieldRunAssessmentTarget = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        textfieldRunAssessmentPasswordFile = new javax.swing.JTextField();
+        textfieldRunAssessmentUserFile = new javax.swing.JTextField();
+        textfieldRunAssessmentProtocol = new javax.swing.JTextField();
+        textfieldRunAssessmentURL = new javax.swing.JTextField();
+        jLabel19 = new javax.swing.JLabel();
+        buttonRunAssessmentRun = new javax.swing.JButton();
+        labelRunAssessmentConnectionStatus = new javax.swing.JLabel();
+        formattedtextfieldRunAssessmentPortNumber = new javax.swing.JFormattedTextField();
+        textfieldRunAssessmentUser = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
+        textfieldRunAssessmentPassword = new javax.swing.JTextField();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        comboboxRunAssessmentAssessments = new javax.swing.JComboBox<>();
         PanelJobs = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TableToolJobs = new javax.swing.JTable();
-        ButtonAssessmentExport = new javax.swing.JButton();
         ButtonRefreshTable = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        TableAssessmentJobs = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         ButtonToolExport = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        textfieldTarget.setToolTipText("");
+        textfieldRunToolTarget.setToolTipText("");
 
         jLabel2.setText("target_name");
 
@@ -439,21 +409,21 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel8.setText("Autopwn GUI v0.1.0");
 
-        comboboxTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
+        comboboxRunToolTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
-        jLabel9.setText("Tool / Assessment");
+        jLabel9.setText("Tool");
 
-        buttonRun.setText("Run");
-        buttonRun.setToolTipText("");
-        buttonRun.addMouseListener(new java.awt.event.MouseAdapter() {
+        buttonRunToolRun.setText("Run");
+        buttonRunToolRun.setToolTipText("");
+        buttonRunToolRun.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                buttonRunMouseClicked(evt);
+                buttonRunToolRunMouseClicked(evt);
             }
         });
 
-        labelConnectionStatus.setForeground(new java.awt.Color(204, 51, 0));
-        labelConnectionStatus.setText("Not Connected!");
-        labelConnectionStatus.setName("labelConnectionStatus"); // NOI18N
+        labelRunToolConnectionStatus.setForeground(new java.awt.Color(204, 51, 0));
+        labelRunToolConnectionStatus.setText("Not Connected!");
+        labelRunToolConnectionStatus.setName("labelRunToolConnectionStatus"); // NOI18N
 
         jLabel12.setText("password");
 
@@ -465,115 +435,237 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel16.setText("url");
 
-        javax.swing.GroupLayout PanelNewJobLayout = new javax.swing.GroupLayout(PanelNewJob);
-        PanelNewJob.setLayout(PanelNewJobLayout);
-        PanelNewJobLayout.setHorizontalGroup(
-            PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelNewJobLayout.createSequentialGroup()
+        javax.swing.GroupLayout PanelRunToolLayout = new javax.swing.GroupLayout(PanelRunTool);
+        PanelRunTool.setLayout(PanelRunToolLayout);
+        PanelRunToolLayout.setHorizontalGroup(
+            PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelRunToolLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(buttonRun, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelNewJobLayout.createSequentialGroup()
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelRunToolLayout.createSequentialGroup()
                         .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(labelConnectionStatus))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelNewJobLayout.createSequentialGroup()
-                        .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 183, Short.MAX_VALUE)
+                        .addComponent(labelRunToolConnectionStatus))
+                    .addComponent(buttonRunToolRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(PanelRunToolLayout.createSequentialGroup()
+                        .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel7)
                             .addComponent(jLabel12)
                             .addComponent(jLabel13)
                             .addComponent(jLabel14)
                             .addComponent(jLabel15)
-                            .addComponent(jLabel16))
+                            .addComponent(jLabel16)
+                            .addComponent(jLabel9))
                         .addGap(12, 12, 12)
-                        .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(textfieldUserFile)
-                            .addComponent(textfieldUser)
-                            .addComponent(textfieldPassword)
-                            .addComponent(textfieldPasswordFile)
-                            .addComponent(textfieldTargetName)
-                            .addComponent(textfieldTarget)
-                            .addComponent(comboboxTools, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(formattedtextfieldPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
-                            .addComponent(textfieldProtocol)
-                            .addComponent(textfieldURL))))
+                        .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(comboboxRunToolTools, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(textfieldRunToolUserFile)
+                            .addComponent(textfieldRunToolUser)
+                            .addComponent(textfieldRunToolPassword)
+                            .addComponent(textfieldRunToolPasswordFile)
+                            .addComponent(textfieldRunToolTargetName)
+                            .addComponent(textfieldRunToolTarget)
+                            .addComponent(formattedtextfieldRunToolPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                            .addComponent(textfieldRunToolProtocol)
+                            .addComponent(textfieldRunToolURL))))
                 .addContainerGap())
         );
-        PanelNewJobLayout.setVerticalGroup(
-            PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PanelNewJobLayout.createSequentialGroup()
+        PanelRunToolLayout.setVerticalGroup(
+            PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelRunToolLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
-                    .addComponent(labelConnectionStatus))
-                .addGap(20, 20, 20)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboboxTools, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelRunToolConnectionStatus))
+                .addGap(18, 18, 18)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(comboboxRunToolTools, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(textfieldTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textfieldTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(textfieldRunToolTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunToolTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(formattedtextfieldPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(formattedtextfieldRunToolPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textfieldPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunToolPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textfieldPasswordFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunToolPasswordFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
-                    .addComponent(textfieldUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(textfieldRunToolUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
-                    .addComponent(textfieldUserFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(textfieldRunToolUserFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel15)
-                    .addComponent(textfieldProtocol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(textfieldRunToolProtocol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelNewJobLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel16)
-                    .addComponent(textfieldURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunToolURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel16))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(buttonRun)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addComponent(buttonRunToolRun)
+                .addContainerGap(91, Short.MAX_VALUE))
         );
 
-        TabbedAutopwn.addTab("New", PanelNewJob);
+        TabbedAutopwn.addTab("Run Tool", PanelRunTool);
+
+        textfieldRunAssessmentTarget.setToolTipText("");
+
+        jLabel4.setText("target_name");
+
+        jLabel11.setText("target");
+
+        jLabel17.setText("port_number");
+
+        jLabel18.setText("password_file");
+
+        jLabel19.setText("Autopwn GUI v0.1.0");
+
+        buttonRunAssessmentRun.setText("Run");
+        buttonRunAssessmentRun.setToolTipText("");
+        buttonRunAssessmentRun.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonRunAssessmentRunMouseClicked(evt);
+            }
+        });
+
+        labelRunAssessmentConnectionStatus.setForeground(new java.awt.Color(204, 51, 0));
+        labelRunAssessmentConnectionStatus.setText("Not Connected!");
+        labelRunAssessmentConnectionStatus.setName("labelConnectionStatus"); // NOI18N
+
+        jLabel21.setText("password");
+
+        jLabel22.setText("user");
+
+        jLabel23.setText("user_file");
+
+        jLabel24.setText("protocol");
+
+        jLabel25.setText("url");
+
+        jLabel26.setText("Assessment");
+
+        comboboxRunAssessmentAssessments.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
+
+        javax.swing.GroupLayout PanelRunAssessmentLayout = new javax.swing.GroupLayout(PanelRunAssessment);
+        PanelRunAssessment.setLayout(PanelRunAssessmentLayout);
+        PanelRunAssessmentLayout.setHorizontalGroup(
+            PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
+                        .addComponent(jLabel19)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 183, Short.MAX_VALUE)
+                        .addComponent(labelRunAssessmentConnectionStatus))
+                    .addComponent(buttonRunAssessmentRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
+                        .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel11)
+                            .addComponent(jLabel17)
+                            .addComponent(jLabel18)
+                            .addComponent(jLabel21)
+                            .addComponent(jLabel22)
+                            .addComponent(jLabel23)
+                            .addComponent(jLabel24)
+                            .addComponent(jLabel25)
+                            .addComponent(jLabel26))
+                        .addGap(12, 12, 12)
+                        .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(comboboxRunAssessmentAssessments, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(textfieldRunAssessmentUserFile)
+                            .addComponent(textfieldRunAssessmentUser)
+                            .addComponent(textfieldRunAssessmentPassword)
+                            .addComponent(textfieldRunAssessmentPasswordFile)
+                            .addComponent(textfieldRunAssessmentTargetName)
+                            .addComponent(textfieldRunAssessmentTarget)
+                            .addComponent(formattedtextfieldRunAssessmentPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                            .addComponent(textfieldRunAssessmentProtocol)
+                            .addComponent(textfieldRunAssessmentURL))))
+                .addContainerGap())
+        );
+        PanelRunAssessmentLayout.setVerticalGroup(
+            PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel19)
+                    .addComponent(labelRunAssessmentConnectionStatus))
+                .addGap(18, 18, 18)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(comboboxRunAssessmentAssessments, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel26))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(textfieldRunAssessmentTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunAssessmentTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel11))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(formattedtextfieldRunAssessmentPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel17))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunAssessmentPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel21))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunAssessmentPasswordFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel18))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel22)
+                    .addComponent(textfieldRunAssessmentUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel23)
+                    .addComponent(textfieldRunAssessmentUserFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel24)
+                    .addComponent(textfieldRunAssessmentProtocol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunAssessmentURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel25))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonRunAssessmentRun)
+                .addContainerGap(91, Short.MAX_VALUE))
+        );
+
+        TabbedAutopwn.addTab("Run Assessment", PanelRunAssessment);
 
         TableToolJobs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "ID", "Name", "Target", "Return Code"
+                "ID", "Name", "Tool", "Target", "Return Code"
             }
         ));
         jScrollPane1.setViewportView(TableToolJobs);
-
-        ButtonAssessmentExport.setText("Export");
-        ButtonAssessmentExport.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ButtonAssessmentExportMouseClicked(evt);
-            }
-        });
 
         ButtonRefreshTable.setText("Refresh tables");
         ButtonRefreshTable.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -582,19 +674,7 @@ public class TabbedPane extends javax.swing.JFrame {
             }
         });
 
-        TableAssessmentJobs.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "ID", "Name", "Target", "Return Code"
-            }
-        ));
-        jScrollPane2.setViewportView(TableAssessmentJobs);
-
-        jLabel1.setText("Assessment Jobs");
-
-        jLabel3.setText("Tool Jobs");
+        jLabel3.setText("Jobs");
 
         ButtonToolExport.setText("Export");
         ButtonToolExport.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -614,15 +694,11 @@ public class TabbedPane extends javax.swing.JFrame {
                         .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(ButtonRefreshTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(ButtonToolExport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
-                            .addComponent(ButtonAssessmentExport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE))
                         .addContainerGap())
                     .addGroup(PanelJobsLayout.createSequentialGroup()
-                        .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel1))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addComponent(jLabel3)
+                        .addGap(0, 411, Short.MAX_VALUE))))
         );
         PanelJobsLayout.setVerticalGroup(
             PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -630,15 +706,9 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ButtonToolExport)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ButtonAssessmentExport)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ButtonRefreshTable)
                 .addGap(21, 21, 21))
@@ -660,16 +730,16 @@ public class TabbedPane extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void buttonRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunMouseClicked
+    private void buttonRunToolRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunToolRunMouseClicked
         // Run job
-        int job_id = SaveAssessmentJob();
+        int job_id = SaveToolJob(0);
         try {
-            Thread.sleep(1000);                 //1000 milliseconds is one second.
+            Thread.sleep(100);
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        RunAssessmentJob(job_id);
-    }//GEN-LAST:event_buttonRunMouseClicked
+        RunToolJob(job_id);
+    }//GEN-LAST:event_buttonRunToolRunMouseClicked
 
     private void ButtonToolExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonToolExportMouseClicked
         // TODO add your handling code here:
@@ -717,50 +787,50 @@ public class TabbedPane extends javax.swing.JFrame {
         // TODO add your handling code here:
         // Populate tool jobs
         PopulateToolJobs();
-        // Populate assessment jobs
-        PopulateAssessmentJobs();
     }//GEN-LAST:event_ButtonRefreshTableMouseClicked
 
-    private void ButtonAssessmentExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonAssessmentExportMouseClicked
-        // TODO add your handling code here:
-        String job_id = TableAssessmentJobs.getValueAt(TableAssessmentJobs.getSelectedRow(), 0).toString();
-        System.out.println(job_id);
-        String sURL = "http://127.0.0.1:5000/assessments/exports/" + job_id; //just a string
-        String message;
-        InputStream fileContent;
-        byte[] buffer = new byte[4096];
-        int n = -1;
+    private void buttonRunAssessmentRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunAssessmentRunMouseClicked
+        // Fetch tools from assessment
+        int assessment_id = comboboxRunAssessmentAssessments.getSelectedIndex();
+        String sURL = "http://127.0.0.1:5000/assessments/" + assessment_id; //just a string
+        JsonArray tools;
 
         // Connect to the URL using java's native library
         try {
             URL url = new URL(sURL);
             HttpURLConnection request = (HttpURLConnection) url.openConnection();
             request.connect();
-            fileContent = request.getInputStream();
 
-            // parent component of the dialog
-            JFrame parentFrame = new JFrame();
+            // Convert to a JSON object to print data
+            JsonParser jp = new JsonParser(); //from gson
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
+            // Get result/tool
+            tools = rootobj.get("result").getAsJsonArray();
 
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Specify a file to save");
+            JsonObject row = tools.get(0).getAsJsonObject();
+            JsonArray tool = row.get("tools").getAsJsonArray();
 
-            int userSelection = fileChooser.showSaveDialog(parentFrame);
+            for (int i = 0; i < tool.size(); i++) {
+                JsonObject tool_id_json = tool.get(i).getAsJsonObject();
+                int tool_id = tool_id_json.get("tool").getAsInt();
 
-            if (userSelection == JFileChooser.APPROVE_OPTION) {
-                File fileToSave = fileChooser.getSelectedFile();
-                System.out.println("Save as file: " + fileToSave.getAbsolutePath());
-
-                OutputStream output = new FileOutputStream(fileToSave);
-                while ((n = fileContent.read(buffer)) != -1)
-                {
-                    output.write(buffer, 0, n);
+                // Run job
+                int job_id = SaveToolJob(tool_id);
+                try {
+                    Thread.sleep(100);
+                } catch(InterruptedException ex) {
+                    Thread.currentThread().interrupt();
                 }
-                output.close();
+                RunToolJob(job_id);
             }
-        } catch (Exception anexc) {
-            // something
+        } catch (Exception exc) {
+            //test
+            System.err.println("error " + exc);
         }
-    }//GEN-LAST:event_ButtonAssessmentExportMouseClicked
+
+
+    }//GEN-LAST:event_buttonRunAssessmentRunMouseClicked
 
     /**
      * @param args the command line arguments
@@ -798,40 +868,60 @@ public class TabbedPane extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ButtonAssessmentExport;
     private javax.swing.JButton ButtonRefreshTable;
     private javax.swing.JButton ButtonToolExport;
     private javax.swing.JPanel PanelJobs;
-    private javax.swing.JPanel PanelNewJob;
+    private javax.swing.JPanel PanelRunAssessment;
+    private javax.swing.JPanel PanelRunTool;
     private javax.swing.JTabbedPane TabbedAutopwn;
-    private javax.swing.JTable TableAssessmentJobs;
     private javax.swing.JTable TableToolJobs;
-    private javax.swing.JButton buttonRun;
-    private javax.swing.JComboBox<String> comboboxTools;
-    private javax.swing.JFormattedTextField formattedtextfieldPortNumber;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton buttonRunAssessmentRun;
+    private javax.swing.JButton buttonRunToolRun;
+    private javax.swing.JComboBox<String> comboboxRunAssessmentAssessments;
+    private javax.swing.JComboBox<String> comboboxRunToolTools;
+    private javax.swing.JFormattedTextField formattedtextfieldRunAssessmentPortNumber;
+    private javax.swing.JFormattedTextField formattedtextfieldRunToolPortNumber;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel labelConnectionStatus;
-    private javax.swing.JTextField textfieldPassword;
-    private javax.swing.JTextField textfieldPasswordFile;
-    private javax.swing.JTextField textfieldProtocol;
-    private javax.swing.JTextField textfieldTarget;
-    private javax.swing.JTextField textfieldTargetName;
-    private javax.swing.JTextField textfieldURL;
-    private javax.swing.JTextField textfieldUser;
-    private javax.swing.JTextField textfieldUserFile;
+    private javax.swing.JLabel labelRunAssessmentConnectionStatus;
+    private javax.swing.JLabel labelRunToolConnectionStatus;
+    private javax.swing.JTextField textfieldRunAssessmentPassword;
+    private javax.swing.JTextField textfieldRunAssessmentPasswordFile;
+    private javax.swing.JTextField textfieldRunAssessmentProtocol;
+    private javax.swing.JTextField textfieldRunAssessmentTarget;
+    private javax.swing.JTextField textfieldRunAssessmentTargetName;
+    private javax.swing.JTextField textfieldRunAssessmentURL;
+    private javax.swing.JTextField textfieldRunAssessmentUser;
+    private javax.swing.JTextField textfieldRunAssessmentUserFile;
+    private javax.swing.JTextField textfieldRunToolPassword;
+    private javax.swing.JTextField textfieldRunToolPasswordFile;
+    private javax.swing.JTextField textfieldRunToolProtocol;
+    private javax.swing.JTextField textfieldRunToolTarget;
+    private javax.swing.JTextField textfieldRunToolTargetName;
+    private javax.swing.JTextField textfieldRunToolURL;
+    private javax.swing.JTextField textfieldRunToolUser;
+    private javax.swing.JTextField textfieldRunToolUserFile;
     // End of variables declaration//GEN-END:variables
 }
