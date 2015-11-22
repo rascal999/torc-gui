@@ -12,9 +12,9 @@ https://hub.docker.com/r/rascal999/autopwn/.
 
 You can use Apache Ant to run autopwn-gui like so:
 
-``git clone https://github.com/rascal999/autopwn-gui``
-``cd autopwn-gui``
-``ant run``
+1. ``git clone https://github.com/rascal999/autopwn-gui``
+2. ``cd autopwn-gui``
+3. ``ant run``
 
 ## Usage
 
