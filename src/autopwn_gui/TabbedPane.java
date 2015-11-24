@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.awt.Color;
+import java.io.*;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,6 +22,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.util.zip.*;
 
 /**
  *
@@ -330,6 +332,145 @@ public class TabbedPane extends javax.swing.JFrame {
         return 1;
     }
 
+    public final int ExportSingleResult(int [] selectedRow) {
+        String defaultFileName, jobId = TableToolJobs.getValueAt(selectedRow[0], 0).toString();
+
+        String sURL = "http://127.0.0.1:5000/tools/jobs/exports/" + jobId; //just a string
+        String message;
+        InputStream fileContent;
+        byte[] buffer = new byte[4096];
+        int n = -1;
+
+        // Connect to the URL using java's native library
+        try {
+            URL url = new URL(sURL);
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            request.connect();
+            fileContent = request.getInputStream();
+
+            // parent component of the dialog
+            JFrame parentFrame = new JFrame();
+
+            defaultFileName = TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 3).toString() +
+                                "_" + TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 2).toString() +
+                                ".zip";
+            // New file path
+            File fileToSavePath = new File(System.getProperty("user.home") + "/" + defaultFileName);
+            // New fileChooser
+            JFileChooser fileChooser = new JFileChooser();
+            // Set fileChooser path to file
+            fileChooser.setSelectedFile(fileToSavePath);
+            fileChooser.setDialogTitle("Specify a file to save");
+
+            int userSelection = fileChooser.showSaveDialog(parentFrame);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+
+                OutputStream output = new FileOutputStream(fileToSave);
+                while ((n = fileContent.read(buffer)) != -1)
+                {
+                    output.write(buffer, 0, n);
+                }
+                output.close();
+            }
+        } catch (Exception anexc) {
+            // something
+        }
+
+        return 0;
+    }
+
+    public final int ExportMultipleResults(int [] selectedRows) {
+        String defaultFileName, jobId;
+
+        InputStream[] fileContent;
+        // Need to improve this
+        fileContent = new InputStream[4096];
+        byte[] buffer = new byte[4096];
+        int n = -1;
+        int count;
+
+        System.out.println("selectedRows.length == " + selectedRows.length);
+        // Fetch results from autopwn node
+        for (int i = 0; i < selectedRows.length; i++){
+            jobId = TableToolJobs.getValueAt(selectedRows[i], 0).toString();
+            System.out.println("jobId == " + jobId);
+            String sURL = "http://127.0.0.1:5000/tools/jobs/exports/" + jobId; //just a string
+
+            // Connect to the URL using java's native library
+            try {
+                URL url = new URL(sURL);
+                HttpURLConnection request = (HttpURLConnection) url.openConnection();
+                request.connect();
+                fileContent[i] = request.getInputStream();
+            } catch (Exception anexc) {
+                // something
+            }
+        }
+
+        try {
+            File fos = new File("wtf.zip");
+            //FileOutputStream fos = new FileOutputStream("wtf.zip");
+            FileOutputStream bos = new FileOutputStream(fos);
+            System.out.println("False???");
+            ZipOutputStream zos = new ZipOutputStream(bos);
+
+            try {
+                for (int i = 0; i < selectedRows.length; i++){
+                    // not available on BufferedOutputStream
+                    zos.putNextEntry(new ZipEntry(TableToolJobs.getValueAt(selectedRows[i], 1).toString() +
+                                    "_" + TableToolJobs.getValueAt(selectedRows[i], 2).toString() +
+                                    ".zip"));
+                    while ((count = fileContent[i].read(buffer)) > 0) {
+                        System.out.println("Writing");
+                        zos.write(buffer, 0, count);
+                    }
+                    // not available on BufferedOutputStream
+                    zos.closeEntry();
+                }
+            }
+            finally {
+                zos.close();
+            }
+
+            // parent component of the dialog
+            JFrame parentFrame = new JFrame();
+
+            defaultFileName = "";
+            // New file path
+            File fileToSavePath = new File(System.getProperty("user.home") + "/" + defaultFileName);
+            // New fileChooser
+            JFileChooser fileChooser = new JFileChooser();
+            // Set fileChooser path to file
+            fileChooser.setSelectedFile(fileToSavePath);
+            fileChooser.setDialogTitle("Specify a file to save");
+
+            int userSelection = fileChooser.showSaveDialog(parentFrame);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+
+                OutputStream output = new FileOutputStream(fileToSave);
+                InputStream input = new FileInputStream(fos);
+                while ((n = input.read(buffer)) != -1)
+                {
+                    output.write(buffer, 0, n);
+                }
+                input.close();
+            }
+
+            fos.delete();
+        } catch(Exception yaexc) {
+            // something
+            System.err.println(yaexc);
+        }
+
+        return 0;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -398,6 +539,11 @@ public class TabbedPane extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         textfieldRunToolTarget.setToolTipText("");
+        textfieldRunToolTarget.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                textfieldRunToolTargetKeyReleased(evt);
+            }
+        });
 
         jLabel2.setText("target_name");
 
@@ -407,7 +553,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel7.setText("password_file");
 
-        jLabel8.setText("Autopwn GUI v0.1.0");
+        jLabel8.setText("Autopwn GUI v0.2.0 - Written by aidan.marlin@gmail.com");
 
         comboboxRunToolTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
@@ -444,7 +590,7 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelRunToolLayout.createSequentialGroup()
                         .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 183, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(labelRunToolConnectionStatus))
                     .addComponent(buttonRunToolRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelRunToolLayout.createSequentialGroup()
@@ -468,7 +614,7 @@ public class TabbedPane extends javax.swing.JFrame {
                             .addComponent(textfieldRunToolPasswordFile)
                             .addComponent(textfieldRunToolTargetName)
                             .addComponent(textfieldRunToolTarget)
-                            .addComponent(formattedtextfieldRunToolPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                            .addComponent(formattedtextfieldRunToolPortNumber)
                             .addComponent(textfieldRunToolProtocol)
                             .addComponent(textfieldRunToolURL))))
                 .addContainerGap())
@@ -522,12 +668,17 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel16))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRunToolRun)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addContainerGap(93, Short.MAX_VALUE))
         );
 
         TabbedAutopwn.addTab("Run Tool", PanelRunTool);
 
         textfieldRunAssessmentTarget.setToolTipText("");
+        textfieldRunAssessmentTarget.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                textfieldRunAssessmentTargetKeyReleased(evt);
+            }
+        });
 
         jLabel4.setText("target_name");
 
@@ -537,7 +688,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel18.setText("password_file");
 
-        jLabel19.setText("Autopwn GUI v0.1.0");
+        jLabel19.setText("Autopwn GUI v0.2.0 - Written by aidan.marlin@gmail.com");
 
         buttonRunAssessmentRun.setText("Run");
         buttonRunAssessmentRun.setToolTipText("");
@@ -574,7 +725,7 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
                         .addComponent(jLabel19)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 183, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                         .addComponent(labelRunAssessmentConnectionStatus))
                     .addComponent(buttonRunAssessmentRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
@@ -598,7 +749,7 @@ public class TabbedPane extends javax.swing.JFrame {
                             .addComponent(textfieldRunAssessmentPasswordFile)
                             .addComponent(textfieldRunAssessmentTargetName)
                             .addComponent(textfieldRunAssessmentTarget)
-                            .addComponent(formattedtextfieldRunAssessmentPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                            .addComponent(formattedtextfieldRunAssessmentPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
                             .addComponent(textfieldRunAssessmentProtocol)
                             .addComponent(textfieldRunAssessmentURL))))
                 .addContainerGap())
@@ -652,7 +803,7 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel25))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRunAssessmentRun)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addContainerGap(93, Short.MAX_VALUE))
         );
 
         TabbedAutopwn.addTab("Run Assessment", PanelRunAssessment);
@@ -668,6 +819,7 @@ public class TabbedPane extends javax.swing.JFrame {
         jScrollPane1.setViewportView(TableToolJobs);
 
         ButtonRefreshTable.setText("Refresh tables");
+        ButtonRefreshTable.setPreferredSize(new java.awt.Dimension(80, 25));
         ButtonRefreshTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 ButtonRefreshTableMouseClicked(evt);
@@ -677,6 +829,7 @@ public class TabbedPane extends javax.swing.JFrame {
         jLabel3.setText("Jobs");
 
         ButtonToolExport.setText("Export");
+        ButtonToolExport.setPreferredSize(new java.awt.Dimension(80, 25));
         ButtonToolExport.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 ButtonToolExportMouseClicked(evt);
@@ -691,14 +844,16 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelJobsLayout.createSequentialGroup()
-                        .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(ButtonRefreshTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(ButtonToolExport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE))
+                        .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                            .addGroup(PanelJobsLayout.createSequentialGroup()
+                                .addComponent(ButtonRefreshTable, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ButtonToolExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addContainerGap())
                     .addGroup(PanelJobsLayout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addGap(0, 411, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         PanelJobsLayout.setVerticalGroup(
             PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -706,12 +861,12 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ButtonToolExport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ButtonRefreshTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ButtonToolExport)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ButtonRefreshTable)
-                .addGap(21, 21, 21))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         TabbedAutopwn.addTab("Jobs", PanelJobs);
@@ -744,50 +899,13 @@ public class TabbedPane extends javax.swing.JFrame {
     private void ButtonToolExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonToolExportMouseClicked
         // TODO add your handling code here:
         // TODO add your handling code here:
-        String defaultFileName, jobId = TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 0).toString();
-        System.out.println(jobId);
-        String sURL = "http://127.0.0.1:5000/tools/jobs/exports/" + jobId; //just a string
-        String message;
-        InputStream fileContent;
-        byte[] buffer = new byte[4096];
-        int n = -1;
+        int [] selectedRows = TableToolJobs.getSelectedRows();
 
-        // Connect to the URL using java's native library
-        try {
-            URL url = new URL(sURL);
-            HttpURLConnection request = (HttpURLConnection) url.openConnection();
-            request.connect();
-            fileContent = request.getInputStream();
-
-            // parent component of the dialog
-            JFrame parentFrame = new JFrame();
-
-            defaultFileName = TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 3).toString() +
-                                "_" + TableToolJobs.getValueAt(TableToolJobs.getSelectedRow(), 2).toString() +
-                                ".zip";
-            // New file path
-            File fileToSavePath = new File(System.getProperty("user.home") + "/" + defaultFileName);
-            // New fileChooser
-            JFileChooser fileChooser = new JFileChooser();
-            // Set fileChooser path to file
-            fileChooser.setSelectedFile(fileToSavePath);
-            fileChooser.setDialogTitle("Specify a file to save");
-
-            int userSelection = fileChooser.showSaveDialog(parentFrame);
-
-            if (userSelection == JFileChooser.APPROVE_OPTION) {
-                File fileToSave = fileChooser.getSelectedFile();
-                System.out.println("Save as file: " + fileToSave.getAbsolutePath());
-
-                OutputStream output = new FileOutputStream(fileToSave);
-                while ((n = fileContent.read(buffer)) != -1)
-                {
-                    output.write(buffer, 0, n);
-                }
-                output.close();
-            }
-        } catch (Exception anexc) {
-            // something
+        if (selectedRows.length > 1) {
+            System.out.println("About to enter ExportMultipleResults");
+            ExportMultipleResults(selectedRows);
+        } else {
+            ExportSingleResult(selectedRows);
         }
     }//GEN-LAST:event_ButtonToolExportMouseClicked
 
@@ -835,10 +953,21 @@ public class TabbedPane extends javax.swing.JFrame {
         } catch (Exception exc) {
             //test
             System.err.println("error " + exc);
+            System.err.println("what the fuck");
         }
 
 
     }//GEN-LAST:event_buttonRunAssessmentRunMouseClicked
+
+    private void textfieldRunToolTargetKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textfieldRunToolTargetKeyReleased
+        // TODO add your handling code here:
+        textfieldRunToolTargetName.setText(textfieldRunToolTarget.getText());
+    }//GEN-LAST:event_textfieldRunToolTargetKeyReleased
+
+    private void textfieldRunAssessmentTargetKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textfieldRunAssessmentTargetKeyReleased
+        // TODO add your handling code here:
+        textfieldRunAssessmentTargetName.setText(textfieldRunAssessmentTarget.getText());
+    }//GEN-LAST:event_textfieldRunAssessmentTargetKeyReleased
 
     /**
      * @param args the command line arguments
