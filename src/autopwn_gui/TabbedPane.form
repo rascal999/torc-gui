@@ -54,14 +54,12 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="26" max="32767" attributes="0"/>
                               <Component id="labelRunToolConnectionStatus" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="buttonRunToolRun" alignment="1" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel12" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -70,21 +68,23 @@
                                   <Component id="jLabel15" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel16" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="comboboxRunToolTools" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunToolUserFile" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunToolUser" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunToolPassword" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunToolPasswordFile" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunToolTargetName" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunToolPasswordFile" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunToolPassword" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunToolUserFile" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunToolUser" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunToolURL" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunToolProtocol" max="32767" attributes="0"/>
+                                  <Component id="formattedtextfieldRunToolPortNumber" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunToolTargetName" max="32767" attributes="0"/>
                                   <Component id="textfieldRunToolTarget" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="formattedtextfieldRunToolPortNumber" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunToolProtocol" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunToolURL" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="comboboxRunToolTools" alignment="1" max="32767" attributes="0"/>
                               </Group>
                           </Group>
+                          <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -105,13 +105,13 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="textfieldRunToolTargetName" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textfieldRunToolTarget" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="textfieldRunToolTarget" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textfieldRunToolTargetName" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -150,7 +150,7 @@
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="buttonRunToolRun" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="93" max="32767" attributes="0"/>
+                      <EmptySpace pref="95" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -196,7 +196,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel8">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.2.0 - Written by aidan.marlin@gmail.com"/>
+                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.3.0 - Written by aidan.marlin@gmail.com"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="comboboxRunToolTools">
@@ -280,7 +280,7 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
@@ -290,7 +290,6 @@
                           <Component id="buttonRunAssessmentRun" alignment="1" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel17" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel18" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -300,23 +299,24 @@
                                   <Component id="jLabel24" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel25" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel26" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="comboboxRunAssessmentAssessments" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunAssessmentUserFile" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunAssessmentUser" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunAssessmentPassword" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunAssessmentPasswordFile" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunAssessmentTargetName" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunAssessmentTarget" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="formattedtextfieldRunAssessmentPortNumber" alignment="0" pref="426" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunAssessmentProtocol" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="textfieldRunAssessmentURL" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunAssessmentTargetName" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunAssessmentTarget" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="comboboxRunAssessmentAssessments" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunAssessmentPassword" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="formattedtextfieldRunAssessmentPortNumber" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunAssessmentUser" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunAssessmentPasswordFile" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunAssessmentURL" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunAssessmentProtocol" max="32767" attributes="0"/>
+                                  <Component id="textfieldRunAssessmentUserFile" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -335,13 +335,13 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="textfieldRunAssessmentTargetName" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textfieldRunAssessmentTarget" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="textfieldRunAssessmentTarget" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textfieldRunAssessmentTargetName" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -380,7 +380,7 @@
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="buttonRunAssessmentRun" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="93" max="32767" attributes="0"/>
+                      <EmptySpace pref="95" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -426,7 +426,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel19">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.2.0 - Written by aidan.marlin@gmail.com"/>
+                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.3.0 - Written by aidan.marlin@gmail.com"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="buttonRunAssessmentRun">
@@ -510,24 +510,31 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="1" attributes="0">
+                          <Component id="jScrollPane1" pref="536" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jScrollPane1" pref="536" max="32767" attributes="0"/>
-                                  <Group type="102" attributes="0">
-                                      <Component id="ButtonRefreshTable" min="-2" pref="211" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                                      <Component id="ButtonToolExport" max="32767" attributes="0"/>
-                                  </Group>
+                                  <Component id="ButtonRefreshTable" alignment="0" min="-2" pref="211" max="-2" attributes="0"/>
+                                  <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="ButtonToolExport" max="32767" attributes="0"/>
                           </Group>
-                          <Group type="102" attributes="0">
-                              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="CheckBoxHideComplete" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="CheckBoxHideIncomplete" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="TextFieldJobsSearch" min="-2" pref="215" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="ButtonRefreshTableBottom" min="-2" pref="211" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="ButtonToolExportBottom" max="32767" attributes="0"/>
                           </Group>
                       </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -541,8 +548,19 @@
                           <Component id="ButtonToolExport" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="ButtonRefreshTable" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="CheckBoxHideComplete" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="CheckBoxHideIncomplete" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="TextFieldJobsSearch" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="342" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="282" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="ButtonToolExportBottom" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="ButtonRefreshTableBottom" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -628,6 +646,55 @@
               </Properties>
               <Events>
                 <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ButtonToolExportMouseClicked"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="CheckBoxHideComplete">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Hide complete"/>
+                <Property name="toolTipText" type="java.lang.String" value="Jobs which have been completed should have a return code"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CheckBoxHideCompleteActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="CheckBoxHideIncomplete">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Hide incomplete"/>
+                <Property name="toolTipText" type="java.lang.String" value="Jobs which have not finished running should have a &apos;null&apos; return code"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CheckBoxHideIncompleteActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JTextField" name="TextFieldJobsSearch">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Search..."/>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="TextFieldJobsSearchMouseClicked"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TextFieldJobsSearchActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="ButtonRefreshTableBottom">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Refresh tables"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[80, 25]"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ButtonRefreshTableBottomMouseClicked"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="ButtonToolExportBottom">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Export"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[80, 25]"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ButtonToolExportBottomMouseClicked"/>
               </Events>
             </Component>
           </SubComponents>

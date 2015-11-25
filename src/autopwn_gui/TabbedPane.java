@@ -21,7 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
 import java.util.zip.*;
 
 /**
@@ -165,6 +167,16 @@ public class TabbedPane extends javax.swing.JFrame {
                 TableToolJobs.setValueAt(tool_name, i, 2);
                 TableToolJobs.setValueAt(target, i, 3);
                 TableToolJobs.setValueAt(return_code, i, 4);
+            }
+
+            // Apply filters
+            if (CheckBoxHideComplete.isSelected())
+            {
+                HideComplete();
+            }
+            if (CheckBoxHideIncomplete.isSelected())
+            {
+                HideIncomplete();
             }
         } catch (Exception exc) {
             //test
@@ -361,6 +373,9 @@ public class TabbedPane extends javax.swing.JFrame {
             // Set fileChooser path to file
             fileChooser.setSelectedFile(fileToSavePath);
             fileChooser.setDialogTitle("Specify a file to save");
+            FileNameExtensionFilter zipType = new FileNameExtensionFilter("Zip file (.zip)", "zip");
+            fileChooser.addChoosableFileFilter(zipType);
+            fileChooser.setFileFilter(zipType);
 
             int userSelection = fileChooser.showSaveDialog(parentFrame);
 
@@ -446,6 +461,9 @@ public class TabbedPane extends javax.swing.JFrame {
             // Set fileChooser path to file
             fileChooser.setSelectedFile(fileToSavePath);
             fileChooser.setDialogTitle("Specify a file to save");
+            FileNameExtensionFilter zipType = new FileNameExtensionFilter("Zip file (.zip)", "zip");
+            fileChooser.addChoosableFileFilter(zipType);
+            fileChooser.setFileFilter(zipType);
 
             int userSelection = fileChooser.showSaveDialog(parentFrame);
 
@@ -469,6 +487,54 @@ public class TabbedPane extends javax.swing.JFrame {
         }
 
         return 0;
+    }
+    
+    public final void TableJobsSearch(String searchString){
+        DefaultTableModel model = (DefaultTableModel) TableToolJobs.getModel();
+        PopulateToolJobs();
+        if (searchString.equals("Search...") == false){
+            if (model.getRowCount() > 0) {
+                for (int i = model.getRowCount() - 1; i > -1; i--) {
+                    // Can search 1 2 3
+                    if ((model.getValueAt(i, 1).toString().contains(searchString) == false) &&
+                        (model.getValueAt(i, 2).toString().contains(searchString) == false) &&
+                        (model.getValueAt(i, 3).toString().contains(searchString) == false)){
+                        model.removeRow(i);
+                    }
+                }
+            }
+        }
+    }
+    
+    public final void HideIncomplete(){
+        DefaultTableModel model = (DefaultTableModel) TableToolJobs.getModel();
+        if (CheckBoxHideIncomplete.isSelected() == true){
+            if (model.getRowCount() > 0) {
+                for (int i = model.getRowCount() - 1; i > -1; i--) {
+                    System.out.println(model.getValueAt(i, 4).toString());
+                    if (model.getValueAt(i, 4).toString().equals("null")){
+                        model.removeRow(i);
+                    }
+                }
+            }
+        } else {
+            PopulateToolJobs();
+        }
+    }
+    
+    public final void HideComplete(){
+        DefaultTableModel model = (DefaultTableModel) TableToolJobs.getModel();
+        if (CheckBoxHideComplete.isSelected() == true){
+            if (model.getRowCount() > 0) {
+                for (int i = model.getRowCount() - 1; i > -1; i--) {
+                    if (model.getValueAt(i, 4).toString().equals("null") != true){
+                        model.removeRow(i);
+                    }
+                }
+            }
+        } else {
+            PopulateToolJobs();
+        }
     }
     
     /**
@@ -535,6 +601,11 @@ public class TabbedPane extends javax.swing.JFrame {
         ButtonRefreshTable = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         ButtonToolExport = new javax.swing.JButton();
+        CheckBoxHideComplete = new javax.swing.JCheckBox();
+        CheckBoxHideIncomplete = new javax.swing.JCheckBox();
+        TextFieldJobsSearch = new javax.swing.JTextField();
+        ButtonRefreshTableBottom = new javax.swing.JButton();
+        ButtonToolExportBottom = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -553,7 +624,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel7.setText("password_file");
 
-        jLabel8.setText("Autopwn GUI v0.2.0 - Written by aidan.marlin@gmail.com");
+        jLabel8.setText("Autopwn GUI v0.3.0 - Written by aidan.marlin@gmail.com");
 
         comboboxRunToolTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
@@ -590,13 +661,11 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelRunToolLayout.createSequentialGroup()
                         .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                         .addComponent(labelRunToolConnectionStatus))
                     .addComponent(buttonRunToolRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelRunToolLayout.createSequentialGroup()
                         .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel5)
                             .addComponent(jLabel6)
                             .addComponent(jLabel7)
                             .addComponent(jLabel12)
@@ -604,19 +673,21 @@ public class TabbedPane extends javax.swing.JFrame {
                             .addComponent(jLabel14)
                             .addComponent(jLabel15)
                             .addComponent(jLabel16)
-                            .addComponent(jLabel9))
-                        .addGap(12, 12, 12)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(comboboxRunToolTools, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(textfieldRunToolUserFile)
-                            .addComponent(textfieldRunToolUser)
+                            .addComponent(textfieldRunToolPasswordFile, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textfieldRunToolPassword)
-                            .addComponent(textfieldRunToolPasswordFile)
+                            .addComponent(textfieldRunToolUserFile, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(textfieldRunToolUser)
+                            .addComponent(textfieldRunToolURL)
+                            .addComponent(textfieldRunToolProtocol)
+                            .addComponent(formattedtextfieldRunToolPortNumber, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textfieldRunToolTargetName)
                             .addComponent(textfieldRunToolTarget)
-                            .addComponent(formattedtextfieldRunToolPortNumber)
-                            .addComponent(textfieldRunToolProtocol)
-                            .addComponent(textfieldRunToolURL))))
+                            .addComponent(comboboxRunToolTools, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jLabel5))
                 .addContainerGap())
         );
         PanelRunToolLayout.setVerticalGroup(
@@ -632,12 +703,12 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(textfieldRunToolTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel5)
+                    .addComponent(textfieldRunToolTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textfieldRunToolTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel2)
+                    .addComponent(textfieldRunToolTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(formattedtextfieldRunToolPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -668,7 +739,7 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel16))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRunToolRun)
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         TabbedAutopwn.addTab("Run Tool", PanelRunTool);
@@ -688,7 +759,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel18.setText("password_file");
 
-        jLabel19.setText("Autopwn GUI v0.2.0 - Written by aidan.marlin@gmail.com");
+        jLabel19.setText("Autopwn GUI v0.3.0 - Written by aidan.marlin@gmail.com");
 
         buttonRunAssessmentRun.setText("Run");
         buttonRunAssessmentRun.setToolTipText("");
@@ -730,7 +801,6 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(buttonRunAssessmentRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
                         .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
                             .addComponent(jLabel11)
                             .addComponent(jLabel17)
                             .addComponent(jLabel18)
@@ -739,19 +809,20 @@ public class TabbedPane extends javax.swing.JFrame {
                             .addComponent(jLabel23)
                             .addComponent(jLabel24)
                             .addComponent(jLabel25)
-                            .addComponent(jLabel26))
-                        .addGap(12, 12, 12)
+                            .addComponent(jLabel26)
+                            .addComponent(jLabel4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(comboboxRunAssessmentAssessments, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(textfieldRunAssessmentUserFile)
-                            .addComponent(textfieldRunAssessmentUser)
-                            .addComponent(textfieldRunAssessmentPassword)
+                            .addComponent(textfieldRunAssessmentTargetName, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(textfieldRunAssessmentTarget, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(comboboxRunAssessmentAssessments, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(textfieldRunAssessmentPassword, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(formattedtextfieldRunAssessmentPortNumber)
+                            .addComponent(textfieldRunAssessmentUser, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textfieldRunAssessmentPasswordFile)
-                            .addComponent(textfieldRunAssessmentTargetName)
-                            .addComponent(textfieldRunAssessmentTarget)
-                            .addComponent(formattedtextfieldRunAssessmentPortNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
+                            .addComponent(textfieldRunAssessmentURL, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textfieldRunAssessmentProtocol)
-                            .addComponent(textfieldRunAssessmentURL))))
+                            .addComponent(textfieldRunAssessmentUserFile))))
                 .addContainerGap())
         );
         PanelRunAssessmentLayout.setVerticalGroup(
@@ -767,12 +838,12 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel26))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(textfieldRunAssessmentTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel11)
+                    .addComponent(textfieldRunAssessmentTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textfieldRunAssessmentTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11))
+                    .addComponent(jLabel4)
+                    .addComponent(textfieldRunAssessmentTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(formattedtextfieldRunAssessmentPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -803,7 +874,7 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel25))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRunAssessmentRun)
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         TabbedAutopwn.addTab("Run Assessment", PanelRunAssessment);
@@ -836,6 +907,50 @@ public class TabbedPane extends javax.swing.JFrame {
             }
         });
 
+        CheckBoxHideComplete.setText("Hide complete");
+        CheckBoxHideComplete.setToolTipText("Jobs which have been completed should have a return code");
+        CheckBoxHideComplete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CheckBoxHideCompleteActionPerformed(evt);
+            }
+        });
+
+        CheckBoxHideIncomplete.setText("Hide incomplete");
+        CheckBoxHideIncomplete.setToolTipText("Jobs which have not finished running should have a 'null' return code");
+        CheckBoxHideIncomplete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CheckBoxHideIncompleteActionPerformed(evt);
+            }
+        });
+
+        TextFieldJobsSearch.setText("Search...");
+        TextFieldJobsSearch.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TextFieldJobsSearchMouseClicked(evt);
+            }
+        });
+        TextFieldJobsSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TextFieldJobsSearchActionPerformed(evt);
+            }
+        });
+
+        ButtonRefreshTableBottom.setText("Refresh tables");
+        ButtonRefreshTableBottom.setPreferredSize(new java.awt.Dimension(80, 25));
+        ButtonRefreshTableBottom.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ButtonRefreshTableBottomMouseClicked(evt);
+            }
+        });
+
+        ButtonToolExportBottom.setText("Export");
+        ButtonToolExportBottom.setPreferredSize(new java.awt.Dimension(80, 25));
+        ButtonToolExportBottom.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ButtonToolExportBottomMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout PanelJobsLayout = new javax.swing.GroupLayout(PanelJobs);
         PanelJobs.setLayout(PanelJobsLayout);
         PanelJobsLayout.setHorizontalGroup(
@@ -843,17 +958,24 @@ public class TabbedPane extends javax.swing.JFrame {
             .addGroup(PanelJobsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelJobsLayout.createSequentialGroup()
-                        .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
-                            .addGroup(PanelJobsLayout.createSequentialGroup()
-                                .addComponent(ButtonRefreshTable, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(ButtonToolExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addContainerGap())
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
                     .addGroup(PanelJobsLayout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(ButtonRefreshTable, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(ButtonToolExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(PanelJobsLayout.createSequentialGroup()
+                        .addComponent(CheckBoxHideComplete)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(CheckBoxHideIncomplete)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(TextFieldJobsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelJobsLayout.createSequentialGroup()
+                        .addComponent(ButtonRefreshTableBottom, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(ButtonToolExportBottom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         PanelJobsLayout.setVerticalGroup(
             PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -864,8 +986,17 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ButtonToolExport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ButtonRefreshTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CheckBoxHideComplete)
+                    .addComponent(CheckBoxHideIncomplete)
+                    .addComponent(TextFieldJobsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ButtonToolExportBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ButtonRefreshTableBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -887,6 +1018,12 @@ public class TabbedPane extends javax.swing.JFrame {
 
     private void buttonRunToolRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunToolRunMouseClicked
         // Run job
+        if (comboboxRunToolTools.getSelectedIndex() == 0)
+        {
+            JOptionPane.showMessageDialog(null, "You need to select a tool to use.", "InfoBox: Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         int job_id = SaveToolJob(0);
         try {
             Thread.sleep(100);
@@ -897,10 +1034,8 @@ public class TabbedPane extends javax.swing.JFrame {
     }//GEN-LAST:event_buttonRunToolRunMouseClicked
 
     private void ButtonToolExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonToolExportMouseClicked
-        // TODO add your handling code here:
-        // TODO add your handling code here:
         int [] selectedRows = TableToolJobs.getSelectedRows();
-
+        
         if (selectedRows.length > 1) {
             System.out.println("About to enter ExportMultipleResults");
             ExportMultipleResults(selectedRows);
@@ -910,13 +1045,18 @@ public class TabbedPane extends javax.swing.JFrame {
     }//GEN-LAST:event_ButtonToolExportMouseClicked
 
     private void ButtonRefreshTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonRefreshTableMouseClicked
-        // TODO add your handling code here:
         // Populate tool jobs
         PopulateToolJobs();
     }//GEN-LAST:event_ButtonRefreshTableMouseClicked
 
     private void buttonRunAssessmentRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunAssessmentRunMouseClicked
         // Fetch tools from assessment
+        if (comboboxRunToolTools.getSelectedIndex() == 0)
+        {
+            JOptionPane.showMessageDialog(null, "You need to select an assessment to use.", "InfoBox: Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         int assessment_id = comboboxRunAssessmentAssessments.getSelectedIndex();
         String sURL = "http://127.0.0.1:5000/assessments/" + assessment_id; //just a string
         JsonArray tools;
@@ -969,6 +1109,43 @@ public class TabbedPane extends javax.swing.JFrame {
         textfieldRunAssessmentTargetName.setText(textfieldRunAssessmentTarget.getText());
     }//GEN-LAST:event_textfieldRunAssessmentTargetKeyReleased
 
+    private void CheckBoxHideCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxHideCompleteActionPerformed
+        // TODO add your handling code here:
+        HideComplete();
+    }//GEN-LAST:event_CheckBoxHideCompleteActionPerformed
+
+    private void CheckBoxHideIncompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxHideIncompleteActionPerformed
+        // TODO add your handling code here:
+        HideIncomplete();
+    }//GEN-LAST:event_CheckBoxHideIncompleteActionPerformed
+
+    private void TextFieldJobsSearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TextFieldJobsSearchMouseClicked
+        // TODO add your handling code here:
+        TextFieldJobsSearch.setText("");
+    }//GEN-LAST:event_TextFieldJobsSearchMouseClicked
+
+    private void TextFieldJobsSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TextFieldJobsSearchActionPerformed
+        // TODO add your handling code here:
+        TableJobsSearch(TextFieldJobsSearch.getText());
+    }//GEN-LAST:event_TextFieldJobsSearchActionPerformed
+
+    private void ButtonRefreshTableBottomMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonRefreshTableBottomMouseClicked
+        // Populate tool jobs
+        PopulateToolJobs();
+    }//GEN-LAST:event_ButtonRefreshTableBottomMouseClicked
+
+    private void ButtonToolExportBottomMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonToolExportBottomMouseClicked
+        // TODO add your handling code here:
+        int [] selectedRows = TableToolJobs.getSelectedRows();
+
+        if (selectedRows.length > 1) {
+            System.out.println("About to enter ExportMultipleResults");
+            ExportMultipleResults(selectedRows);
+        } else {
+            ExportSingleResult(selectedRows);
+        }
+    }//GEN-LAST:event_ButtonToolExportBottomMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -1006,12 +1183,17 @@ public class TabbedPane extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ButtonRefreshTable;
+    private javax.swing.JButton ButtonRefreshTableBottom;
     private javax.swing.JButton ButtonToolExport;
+    private javax.swing.JButton ButtonToolExportBottom;
+    private javax.swing.JCheckBox CheckBoxHideComplete;
+    private javax.swing.JCheckBox CheckBoxHideIncomplete;
     private javax.swing.JPanel PanelJobs;
     private javax.swing.JPanel PanelRunAssessment;
     private javax.swing.JPanel PanelRunTool;
     private javax.swing.JTabbedPane TabbedAutopwn;
     private javax.swing.JTable TableToolJobs;
+    private javax.swing.JTextField TextFieldJobsSearch;
     private javax.swing.JButton buttonRunAssessmentRun;
     private javax.swing.JButton buttonRunToolRun;
     private javax.swing.JComboBox<String> comboboxRunAssessmentAssessments;
