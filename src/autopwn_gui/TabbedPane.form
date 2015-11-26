@@ -196,7 +196,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel8">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.3.0 - Written by aidan.marlin@gmail.com"/>
+                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.3.1 - Written by aidan.marlin@gmail.com"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="comboboxRunToolTools">
@@ -426,7 +426,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel19">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.3.0 - Written by aidan.marlin@gmail.com"/>
+                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.3.1 - Written by aidan.marlin@gmail.com"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="buttonRunAssessmentRun">

@@ -624,7 +624,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel7.setText("password_file");
 
-        jLabel8.setText("Autopwn GUI v0.3.0 - Written by aidan.marlin@gmail.com");
+        jLabel8.setText("Autopwn GUI v0.3.1 - Written by aidan.marlin@gmail.com");
 
         comboboxRunToolTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
@@ -759,7 +759,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel18.setText("password_file");
 
-        jLabel19.setText("Autopwn GUI v0.3.0 - Written by aidan.marlin@gmail.com");
+        jLabel19.setText("Autopwn GUI v0.3.1 - Written by aidan.marlin@gmail.com");
 
         buttonRunAssessmentRun.setText("Run");
         buttonRunAssessmentRun.setToolTipText("");
@@ -1051,7 +1051,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
     private void buttonRunAssessmentRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunAssessmentRunMouseClicked
         // Fetch tools from assessment
-        if (comboboxRunToolTools.getSelectedIndex() == 0)
+        if (comboboxRunAssessmentAssessments.getSelectedIndex() == 0)
         {
             JOptionPane.showMessageDialog(null, "You need to select an assessment to use.", "InfoBox: Error", JOptionPane.INFORMATION_MESSAGE);
             return;
