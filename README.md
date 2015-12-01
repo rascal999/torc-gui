@@ -4,7 +4,7 @@ Graphical user interface endpoint for autopwn
 
 ## Installation
 
-You need to install autopwn (https://github.com/nccgroup/autopwn) in order to
+You need to install autopwn (https://github.com/rascal999/autopwn) in order to
 use this tool. It is recommended to use the autopwn docker image available at
 https://hub.docker.com/r/rascal999/autopwn/.
 
