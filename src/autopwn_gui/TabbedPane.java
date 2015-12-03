@@ -214,7 +214,7 @@ public class TabbedPane extends javax.swing.JFrame {
         return true;
     }
 
-    public final int SaveToolJob(int param_tool_id) {
+    public final int SaveToolJob(String target, int param_tool_id) {
         String sURL = "http://127.0.0.1:5000/tools/jobs"; //just a string
         int job_id = 0, tool_id = 0;
         String urlParameters;
@@ -223,8 +223,8 @@ public class TabbedPane extends javax.swing.JFrame {
         try {
             if (PanelRunTool.isVisible() ==  true){
                  urlParameters = "tool=" + comboboxRunToolTools.getSelectedIndex() +
-                        "&target=" + textfieldRunToolTarget.getText() +
-                        "&target_name=" + textfieldRunToolTargetName.getText() +
+                        "&target=" + target +
+                        "&target_name=" + textfieldRunToolJobName.getText() +
                         "&protocol=" + textfieldRunToolProtocol.getText() +
                         "&port_number=" + formattedtextfieldRunToolPortNumber.getText() +
                         "&user=" + textfieldRunToolUser.getText() +
@@ -234,8 +234,8 @@ public class TabbedPane extends javax.swing.JFrame {
             } else {
                 tool_id = param_tool_id;
                 urlParameters = "tool=" + tool_id +
-                        "&target=" + textfieldRunAssessmentTarget.getText() +
-                        "&target_name=" + textfieldRunAssessmentTargetName.getText() +
+                        "&target=" + target +
+                        "&target_name=" + textfieldRunAssessmentJobName.getText() +
                         "&protocol=" + textfieldRunAssessmentProtocol.getText() +
                         "&port_number=" + formattedtextfieldRunAssessmentPortNumber.getText() +
                         "&user=" + textfieldRunAssessmentUser.getText() +
@@ -437,6 +437,8 @@ public class TabbedPane extends javax.swing.JFrame {
                     // not available on BufferedOutputStream
                     zos.putNextEntry(new ZipEntry(TableToolJobs.getValueAt(selectedRows[i], 1).toString() +
                                     "_" + TableToolJobs.getValueAt(selectedRows[i], 2).toString() +
+                                    "_" + TableToolJobs.getValueAt(selectedRows[i], 3).toString() +
+                                    "_" + TableToolJobs.getValueAt(selectedRows[i], 0).toString() +
                                     ".zip"));
                     while ((count = fileContent[i].read(buffer)) > 0) {
                         System.out.println("Writing");
@@ -548,8 +550,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         TabbedAutopwn = new javax.swing.JTabbedPane();
         PanelRunTool = new javax.swing.JPanel();
-        textfieldRunToolTargetName = new javax.swing.JTextField();
-        textfieldRunToolTarget = new javax.swing.JTextField();
+        textfieldRunToolJobName = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -571,11 +572,14 @@ public class TabbedPane extends javax.swing.JFrame {
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        textAreaToolTargetList = new javax.swing.JTextArea();
         PanelRunAssessment = new javax.swing.JPanel();
-        textfieldRunAssessmentTargetName = new javax.swing.JTextField();
-        textfieldRunAssessmentTarget = new javax.swing.JTextField();
+        textfieldRunAssessmentJobName = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         textfieldRunAssessmentPasswordFile = new javax.swing.JTextField();
@@ -595,6 +599,12 @@ public class TabbedPane extends javax.swing.JFrame {
         jLabel25 = new javax.swing.JLabel();
         jLabel26 = new javax.swing.JLabel();
         comboboxRunAssessmentAssessments = new javax.swing.JComboBox<>();
+        jLabel27 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jLabel28 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        textAreaAssessmentTargetList = new javax.swing.JTextArea();
+        jLabel29 = new javax.swing.JLabel();
         PanelJobs = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TableToolJobs = new javax.swing.JTable();
@@ -609,22 +619,15 @@ public class TabbedPane extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        textfieldRunToolTarget.setToolTipText("");
-        textfieldRunToolTarget.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                textfieldRunToolTargetKeyReleased(evt);
-            }
-        });
+        jLabel2.setText("job_name");
 
-        jLabel2.setText("target_name");
-
-        jLabel5.setText("target");
+        jLabel5.setText("target_list");
 
         jLabel6.setText("port_number");
 
         jLabel7.setText("password_file");
 
-        jLabel8.setText("Autopwn GUI v0.3.1 - Written by aidan.marlin@gmail.com");
+        jLabel8.setText("Autopwn GUI v0.4.0 - autopwn.org");
 
         comboboxRunToolTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
@@ -652,6 +655,21 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel16.setText("url");
 
+        jLabel20.setText("target_file");
+
+        jButton1.setText("Upload");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("file");
+
+        textAreaToolTargetList.setColumns(20);
+        textAreaToolTargetList.setRows(5);
+        jScrollPane3.setViewportView(textAreaToolTargetList);
+
         javax.swing.GroupLayout PanelRunToolLayout = new javax.swing.GroupLayout(PanelRunTool);
         PanelRunTool.setLayout(PanelRunToolLayout);
         PanelRunToolLayout.setHorizontalGroup(
@@ -661,7 +679,7 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelRunToolLayout.createSequentialGroup()
                         .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 185, Short.MAX_VALUE)
                         .addComponent(labelRunToolConnectionStatus))
                     .addComponent(buttonRunToolRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelRunToolLayout.createSequentialGroup()
@@ -673,7 +691,6 @@ public class TabbedPane extends javax.swing.JFrame {
                             .addComponent(jLabel14)
                             .addComponent(jLabel15)
                             .addComponent(jLabel16)
-                            .addComponent(jLabel9)
                             .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -684,10 +701,21 @@ public class TabbedPane extends javax.swing.JFrame {
                             .addComponent(textfieldRunToolURL)
                             .addComponent(textfieldRunToolProtocol)
                             .addComponent(formattedtextfieldRunToolPortNumber, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(textfieldRunToolTargetName)
-                            .addComponent(textfieldRunToolTarget)
-                            .addComponent(comboboxRunToolTools, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jLabel5))
+                            .addComponent(textfieldRunToolJobName)))
+                    .addGroup(PanelRunToolLayout.createSequentialGroup()
+                        .addComponent(jLabel20)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(PanelRunToolLayout.createSequentialGroup()
+                        .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel5))
+                        .addGap(37, 37, 37)
+                        .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3)
+                            .addComponent(comboboxRunToolTools, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         PanelRunToolLayout.setVerticalGroup(
@@ -702,13 +730,20 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(comboboxRunToolTools, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(textfieldRunToolTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
+                    .addGroup(PanelRunToolLayout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(textfieldRunToolTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton1)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel20))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunToolJobName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(formattedtextfieldRunToolPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -739,27 +774,18 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel16))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRunToolRun)
-                .addContainerGap(95, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         TabbedAutopwn.addTab("Run Tool", PanelRunTool);
 
-        textfieldRunAssessmentTarget.setToolTipText("");
-        textfieldRunAssessmentTarget.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                textfieldRunAssessmentTargetKeyReleased(evt);
-            }
-        });
-
-        jLabel4.setText("target_name");
-
-        jLabel11.setText("target");
+        jLabel4.setText("job_name");
 
         jLabel17.setText("port_number");
 
         jLabel18.setText("password_file");
 
-        jLabel19.setText("Autopwn GUI v0.3.1 - Written by aidan.marlin@gmail.com");
+        jLabel19.setText("Autopwn GUI v0.4.0 - autopwn.org");
 
         buttonRunAssessmentRun.setText("Run");
         buttonRunAssessmentRun.setToolTipText("");
@@ -787,6 +813,23 @@ public class TabbedPane extends javax.swing.JFrame {
 
         comboboxRunAssessmentAssessments.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
+        jLabel27.setText("target_file");
+
+        jButton2.setText("Upload");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jLabel28.setText("file");
+
+        textAreaAssessmentTargetList.setColumns(20);
+        textAreaAssessmentTargetList.setRows(5);
+        jScrollPane4.setViewportView(textAreaAssessmentTargetList);
+
+        jLabel29.setText("target_list");
+
         javax.swing.GroupLayout PanelRunAssessmentLayout = new javax.swing.GroupLayout(PanelRunAssessment);
         PanelRunAssessment.setLayout(PanelRunAssessmentLayout);
         PanelRunAssessmentLayout.setHorizontalGroup(
@@ -796,12 +839,11 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
                         .addComponent(jLabel19)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 185, Short.MAX_VALUE)
                         .addComponent(labelRunAssessmentConnectionStatus))
                     .addComponent(buttonRunAssessmentRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
                         .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11)
                             .addComponent(jLabel17)
                             .addComponent(jLabel18)
                             .addComponent(jLabel21)
@@ -809,20 +851,31 @@ public class TabbedPane extends javax.swing.JFrame {
                             .addComponent(jLabel23)
                             .addComponent(jLabel24)
                             .addComponent(jLabel25)
-                            .addComponent(jLabel26)
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(textfieldRunAssessmentTargetName, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(textfieldRunAssessmentTarget, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(comboboxRunAssessmentAssessments, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(textfieldRunAssessmentJobName, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textfieldRunAssessmentPassword, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(formattedtextfieldRunAssessmentPortNumber)
                             .addComponent(textfieldRunAssessmentUser, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textfieldRunAssessmentPasswordFile)
                             .addComponent(textfieldRunAssessmentURL, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textfieldRunAssessmentProtocol)
-                            .addComponent(textfieldRunAssessmentUserFile))))
+                            .addComponent(textfieldRunAssessmentUserFile)))
+                    .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
+                        .addComponent(jLabel27)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel28, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
+                        .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel29)
+                            .addComponent(jLabel26))
+                        .addGap(24, 24, 24)
+                        .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(comboboxRunAssessmentAssessments, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane4))))
                 .addContainerGap())
         );
         PanelRunAssessmentLayout.setVerticalGroup(
@@ -837,13 +890,20 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(comboboxRunAssessmentAssessments, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel26))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11)
-                    .addComponent(textfieldRunAssessmentTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
+                    .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
+                        .addComponent(jLabel29)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(textfieldRunAssessmentTargetName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton2)
+                    .addComponent(jLabel28)
+                    .addComponent(jLabel27))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textfieldRunAssessmentJobName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(formattedtextfieldRunAssessmentPortNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -874,7 +934,7 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(jLabel25))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonRunAssessmentRun)
-                .addContainerGap(95, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         TabbedAutopwn.addTab("Run Assessment", PanelRunAssessment);
@@ -992,7 +1052,7 @@ public class TabbedPane extends javax.swing.JFrame {
                     .addComponent(CheckBoxHideIncomplete)
                     .addComponent(TextFieldJobsSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelJobsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ButtonToolExportBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1024,13 +1084,24 @@ public class TabbedPane extends javax.swing.JFrame {
             return;
         }
 
-        int job_id = SaveToolJob(0);
-        try {
-            Thread.sleep(100);
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
+        if (textfieldRunToolJobName.getText().equals(""))
+        {
+            JOptionPane.showMessageDialog(null, "You need to specify a job name.", "InfoBox: Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
-        RunToolJob(job_id);
+        
+        String []target = textAreaToolTargetList.getText().split(System.getProperty(("line.separator")));
+
+        for (String individualTarget: target)
+        {
+            int job_id = SaveToolJob(individualTarget, 0);
+            try {
+                Thread.sleep(100);
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            RunToolJob(job_id);
+        }
     }//GEN-LAST:event_buttonRunToolRunMouseClicked
 
     private void ButtonToolExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ButtonToolExportMouseClicked
@@ -1056,6 +1127,12 @@ public class TabbedPane extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "You need to select an assessment to use.", "InfoBox: Error", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+        
+        if (textfieldRunAssessmentJobName.getText().equals(""))
+        {
+            JOptionPane.showMessageDialog(null, "You need to specify a job name.", "InfoBox: Error", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
         int assessment_id = comboboxRunAssessmentAssessments.getSelectedIndex();
         String sURL = "http://127.0.0.1:5000/assessments/" + assessment_id; //just a string
@@ -1077,37 +1154,30 @@ public class TabbedPane extends javax.swing.JFrame {
             JsonObject row = tools.get(0).getAsJsonObject();
             JsonArray tool = row.get("tools").getAsJsonArray();
 
-            for (int i = 0; i < tool.size(); i++) {
-                JsonObject tool_id_json = tool.get(i).getAsJsonObject();
-                int tool_id = tool_id_json.get("tool").getAsInt();
+            String []target = textAreaAssessmentTargetList.getText().split(System.getProperty(("line.separator")));
 
-                // Run job
-                int job_id = SaveToolJob(tool_id);
-                try {
-                    Thread.sleep(100);
-                } catch(InterruptedException ex) {
-                    Thread.currentThread().interrupt();
+            for (String individualTarget: target)
+            {            
+                for (int i = 0; i < tool.size(); i++) {
+                    JsonObject tool_id_json = tool.get(i).getAsJsonObject();
+                    int tool_id = tool_id_json.get("tool").getAsInt();
+
+                    // Run job
+                    int job_id = SaveToolJob(individualTarget, tool_id);
+                    try {
+                        Thread.sleep(100);
+                    } catch(InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    RunToolJob(job_id);
                 }
-                RunToolJob(job_id);
             }
         } catch (Exception exc) {
             //test
             System.err.println("error " + exc);
             System.err.println("what the fuck");
         }
-
-
     }//GEN-LAST:event_buttonRunAssessmentRunMouseClicked
-
-    private void textfieldRunToolTargetKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textfieldRunToolTargetKeyReleased
-        // TODO add your handling code here:
-        textfieldRunToolTargetName.setText(textfieldRunToolTarget.getText());
-    }//GEN-LAST:event_textfieldRunToolTargetKeyReleased
-
-    private void textfieldRunAssessmentTargetKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textfieldRunAssessmentTargetKeyReleased
-        // TODO add your handling code here:
-        textfieldRunAssessmentTargetName.setText(textfieldRunAssessmentTarget.getText());
-    }//GEN-LAST:event_textfieldRunAssessmentTargetKeyReleased
 
     private void CheckBoxHideCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxHideCompleteActionPerformed
         // TODO add your handling code here:
@@ -1145,6 +1215,14 @@ public class TabbedPane extends javax.swing.JFrame {
             ExportSingleResult(selectedRows);
         }
     }//GEN-LAST:event_ButtonToolExportBottomMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1200,7 +1278,9 @@ public class TabbedPane extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> comboboxRunToolTools;
     private javax.swing.JFormattedTextField formattedtextfieldRunAssessmentPortNumber;
     private javax.swing.JFormattedTextField formattedtextfieldRunToolPortNumber;
-    private javax.swing.JLabel jLabel11;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
@@ -1210,12 +1290,16 @@ public class TabbedPane extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1224,21 +1308,23 @@ public class TabbedPane extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel labelRunAssessmentConnectionStatus;
     private javax.swing.JLabel labelRunToolConnectionStatus;
+    private javax.swing.JTextArea textAreaAssessmentTargetList;
+    private javax.swing.JTextArea textAreaToolTargetList;
+    private javax.swing.JTextField textfieldRunAssessmentJobName;
     private javax.swing.JTextField textfieldRunAssessmentPassword;
     private javax.swing.JTextField textfieldRunAssessmentPasswordFile;
     private javax.swing.JTextField textfieldRunAssessmentProtocol;
-    private javax.swing.JTextField textfieldRunAssessmentTarget;
-    private javax.swing.JTextField textfieldRunAssessmentTargetName;
     private javax.swing.JTextField textfieldRunAssessmentURL;
     private javax.swing.JTextField textfieldRunAssessmentUser;
     private javax.swing.JTextField textfieldRunAssessmentUserFile;
+    private javax.swing.JTextField textfieldRunToolJobName;
     private javax.swing.JTextField textfieldRunToolPassword;
     private javax.swing.JTextField textfieldRunToolPasswordFile;
     private javax.swing.JTextField textfieldRunToolProtocol;
-    private javax.swing.JTextField textfieldRunToolTarget;
-    private javax.swing.JTextField textfieldRunToolTargetName;
     private javax.swing.JTextField textfieldRunToolURL;
     private javax.swing.JTextField textfieldRunToolUser;
     private javax.swing.JTextField textfieldRunToolUserFile;
