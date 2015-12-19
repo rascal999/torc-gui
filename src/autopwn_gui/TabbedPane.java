@@ -143,8 +143,9 @@ public class TabbedPane extends javax.swing.JFrame {
             // Convert to a JSON object to print data
             JsonParser jp = new JsonParser(); //from gson
             JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
-            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
-            tools = rootobj.get("result").getAsJsonArray();
+            JsonArray rootobj = root.getAsJsonArray(); //May be an array, may be an object.
+            System.out.println("cool");
+            tools = rootobj.getAsJsonArray();
             System.out.println(tools);
             DefaultTableModel model = (DefaultTableModel) TableToolJobs.getModel();
             // Remove rows
@@ -629,7 +630,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel7.setText("password_file");
 
-        jLabel8.setText("Autopwn GUI v0.4.1 - autopwn.org");
+        jLabel8.setText("Autopwn GUI v0.4.2 - autopwn.org");
 
         comboboxRunToolTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
@@ -792,7 +793,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel18.setText("password_file");
 
-        jLabel19.setText("Autopwn GUI v0.4.1 - autopwn.org");
+        jLabel19.setText("Autopwn GUI v0.4.2 - autopwn.org");
 
         buttonRunAssessmentRun.setText("Run");
         buttonRunAssessmentRun.setToolTipText("");
