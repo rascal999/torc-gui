@@ -230,7 +230,8 @@ public class TabbedPane extends javax.swing.JFrame {
                         "&user=" + textfieldRunToolUser.getText() +
                         "&password=" + textfieldRunToolPassword.getText() +
                         "&user_file=" + textfieldRunToolUserFile.getText() +
-                        "&password_file=" + textfieldRunToolPasswordFile.getText();
+                        "&password_file=" + textfieldRunToolPasswordFile.getText() +
+                        "&url=" + textfieldRunToolURL.getText();
             } else {
                 tool_id = param_tool_id;
                 urlParameters = "tool=" + tool_id +
@@ -241,7 +242,8 @@ public class TabbedPane extends javax.swing.JFrame {
                         "&user=" + textfieldRunAssessmentUser.getText() +
                         "&password=" + textfieldRunAssessmentPassword.getText() +
                         "&user_file=" + textfieldRunAssessmentUserFile.getText() +
-                        "&password_file=" + textfieldRunAssessmentPasswordFile.getText();
+                        "&password_file=" + textfieldRunAssessmentPasswordFile.getText() +
+                        "&url=" + textfieldRunAssessmentURL.getText();
             }
 
             byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
@@ -627,7 +629,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel7.setText("password_file");
 
-        jLabel8.setText("Autopwn GUI v0.4.0 - autopwn.org");
+        jLabel8.setText("Autopwn GUI v0.4.1 - autopwn.org");
 
         comboboxRunToolTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
@@ -638,6 +640,11 @@ public class TabbedPane extends javax.swing.JFrame {
         buttonRunToolRun.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 buttonRunToolRunMouseClicked(evt);
+            }
+        });
+        buttonRunToolRun.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonRunToolRunActionPerformed(evt);
             }
         });
 
@@ -785,7 +792,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel18.setText("password_file");
 
-        jLabel19.setText("Autopwn GUI v0.4.0 - autopwn.org");
+        jLabel19.setText("Autopwn GUI v0.4.1 - autopwn.org");
 
         buttonRunAssessmentRun.setText("Run");
         buttonRunAssessmentRun.setToolTipText("");
@@ -1223,6 +1230,10 @@ public class TabbedPane extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void buttonRunToolRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRunToolRunActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonRunToolRunActionPerformed
 
     /**
      * @param args the command line arguments
