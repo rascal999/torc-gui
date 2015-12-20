@@ -54,7 +54,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="185" max="32767" attributes="0"/>
+                              <EmptySpace pref="101" max="32767" attributes="0"/>
                               <Component id="labelRunToolConnectionStatus" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="buttonRunToolRun" alignment="1" max="32767" attributes="0"/>
@@ -211,7 +211,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel8">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.4.2 - autopwn.org"/>
+                <Property name="text" type="java.lang.String" value="Torc GUI v0.1.0 - github.com/rascal999/torc-gui"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="comboboxRunToolTools">
@@ -333,7 +333,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="185" max="32767" attributes="0"/>
+                              <EmptySpace pref="101" max="32767" attributes="0"/>
                               <Component id="labelRunAssessmentConnectionStatus" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="buttonRunAssessmentRun" alignment="1" max="32767" attributes="0"/>
@@ -485,7 +485,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel19">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Autopwn GUI v0.4.2 - autopwn.org"/>
+                <Property name="text" type="java.lang.String" value="Torc GUI v0.1.0 - github.com/rascal999/torc-gui"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="buttonRunAssessmentRun">

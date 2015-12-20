@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package autopwn_gui;
+package torc_gui;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -630,7 +630,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel7.setText("password_file");
 
-        jLabel8.setText("Autopwn GUI v0.4.2 - autopwn.org");
+        jLabel8.setText("Torc GUI v0.1.0 - github.com/rascal999/torc-gui");
 
         comboboxRunToolTools.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None" }));
 
@@ -687,7 +687,7 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addGroup(PanelRunToolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelRunToolLayout.createSequentialGroup()
                         .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 185, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 101, Short.MAX_VALUE)
                         .addComponent(labelRunToolConnectionStatus))
                     .addComponent(buttonRunToolRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelRunToolLayout.createSequentialGroup()
@@ -793,7 +793,7 @@ public class TabbedPane extends javax.swing.JFrame {
 
         jLabel18.setText("password_file");
 
-        jLabel19.setText("Autopwn GUI v0.4.2 - autopwn.org");
+        jLabel19.setText("Torc GUI v0.1.0 - github.com/rascal999/torc-gui");
 
         buttonRunAssessmentRun.setText("Run");
         buttonRunAssessmentRun.setToolTipText("");
@@ -847,7 +847,7 @@ public class TabbedPane extends javax.swing.JFrame {
                 .addGroup(PanelRunAssessmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelRunAssessmentLayout.createSequentialGroup()
                         .addComponent(jLabel19)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 185, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 101, Short.MAX_VALUE)
                         .addComponent(labelRunAssessmentConnectionStatus))
                     .addComponent(buttonRunAssessmentRun, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelRunAssessmentLayout.createSequentialGroup()

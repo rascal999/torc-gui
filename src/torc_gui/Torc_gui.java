@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package autopwn_gui;
+package torc_gui;
 
 /**
  *
  * @author user
  */
-public class Autopwn_gui {
+public class Torc_gui {
 
     /**
      * @param args the command line arguments
