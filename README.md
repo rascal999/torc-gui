@@ -1,20 +1,18 @@
-<<<<<<< HEAD
-# autopwn-gui
-
-Graphical user interface endpoint for autopwn
+# torc-gui
+Graphical user interface endpoint for torc
 
 ## Installation
 
-You need to install autopwn (https://github.com/rascal999/autopwn) in order to
-use this tool. It is recommended to use the autopwn docker image available at
-https://hub.docker.com/r/rascal999/autopwn/.
+You need to install torc (https://github.com/rascal999/torc) in order to
+use this tool. It is recommended to use the torc docker image available at
+https://hub.docker.com/r/rascal999/torc/.
 
 #### From git (using Apache Ant)
 
-You can use Apache Ant to run autopwn-gui like so:
+You can use Apache Ant to run torc-gui like so:
 
-1. ``git clone https://github.com/rascal999/autopwn-gui``
-2. ``cd autopwn-gui``
+1. ``git clone https://github.com/rascal999/torc-gui``
+2. ``cd torc-gui``
 3. ``ant run``
 
 ## Usage
@@ -39,6 +37,3 @@ export tool results from here and save them to your disk.
 
 Developed by Aidan Marlin (aidan [dot] marlin [at] gmail [dot] com).
 =======
-# torc-gui
-Graphical user interface endpoint for torc
->>>>>>> c3b481ba95b0851d67cbf1e638d03b8149fa4be4
